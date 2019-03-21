@@ -161,7 +161,7 @@ struct HeatMapJointCandidate {
     }
 }
 
-class PoseEstimation {
+open class PoseEstimation {
     
     var poseOutputImages: [UIImage] = []
     var running: Bool = false
@@ -175,34 +175,10 @@ class PoseEstimation {
     var coremlProcessingFinish = Date()
     let scoreThreasholdFactor = Float32(2)
     var timeElapsedString: String = ""
+    let model: MLModel
     
-    func viewDidLoad() {
-        //super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-//        guard let calculator = MetalCalculator() else {
-//            return
-//        }
-        
-        //        _ = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { (_) in
-        //            if calculator.initCalulation(for: .partialSum) == nil {
-        //                let testData = (0..<50000).map{ _ in Float(arc4random_uniform(100)) }
-        //                var start = mach_absolute_time()
-        //                let metalGPUResult = calculator.calculateAvarage(data: testData)
-        //                var end = mach_absolute_time()
-        //                let gpuTime = Double(end - start) / Double(NSEC_PER_SEC)
-        //                print("Metal GPU result: \(metalGPUResult), time: \(gpuTime)")
-        //                start = mach_absolute_time()
-        //                let cpuResult = testData.map({ Double($0) }).reduce(0, +) / Double(testData.count)
-        //                end = mach_absolute_time()
-        //                let cpuTime = Double(end - start) / Double(NSEC_PER_SEC)
-        //                print("Pure CPU result: \(cpuResult), time: \(cpuTime)")
-        //                print("GPU is \(cpuTime / gpuTime) times faster than CPU")
-        //            }
-        //        }
-        
-        DispatchQueue.main.async {
-            self.processImage()
-        }
+    public init(model: MLModel) {
+        self.model = model
     }
     
     func stride(x1: Int, y1: Int, x2: Int, y2: Int,
@@ -290,8 +266,7 @@ class PoseEstimation {
         
         do {
             let uiImage = #imageLiteral(resourceName: "five_people")
-            let coreModel = PoseModel().model
-            let model = try VNCoreMLModel(for: coreModel)
+            let model = try VNCoreMLModel(for: self.model)
             //let output = coreModel.modelDescription.outputDescriptionsByName["net_output"]
             let coremlRequest = VNCoreMLRequest(model: model) { request, error in
                 guard let observations = request.results as? [VNCoreMLFeatureValueObservation] else {

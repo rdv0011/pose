@@ -5,7 +5,7 @@
 //  Copyright © 2019 Dmitry Rybakov. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+@import UIKit;
 
 //! Project version number for pose.
 FOUNDATION_EXPORT double poseVersionNumber;

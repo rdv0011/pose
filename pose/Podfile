@@ -13,3 +13,11 @@ target 'poseTests' do
   use_frameworks!
 
 end
+
+target 'poseDemo' do
+    # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+    use_frameworks!
+    
+    pod 'CoreMLHelpers', :git => 'git://github.com/hollance/CoreMLHelpers'
+    
+end
