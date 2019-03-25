@@ -9,8 +9,9 @@ import UIKit
 import CoreML
 import Vision
 import CoreMLHelpers
+import SwiftyBeaver
 
-struct JointPoint: Hashable {
+public struct JointPoint: Hashable {
     let x: Int
     let y: Int
     var hash: Int {
@@ -18,7 +19,7 @@ struct JointPoint: Hashable {
     }
 }
 
-struct JointConnectionWithScore {
+public struct JointConnectionWithScore {
     let connection: PoseMPI15.JointConnection
     let score: Float32
     let count: Int
@@ -60,7 +61,7 @@ enum BodyJoint: String, CaseIterable {
     }
 }
 
-struct PoseMPI15 {
+public struct PoseMPI15 {
     var joints = BodyJoint.array
     var jointConnections = JointConnection.array
     
@@ -162,26 +163,27 @@ struct HeatMapJointCandidate {
 }
 
 open class PoseEstimation {
-    
-    var poseOutputImages: [UIImage] = []
-    var running: Bool = false
-    
+
+    let model: MLModel
     let layersCount = 44
     let backgroundLayerIndex = 15
-    let pafLayerIndex = 16
-    let outputWidh = 64
-    let outputHeight = 64
-    var coremlProcessingStart = Date()
-    var coremlProcessingFinish = Date()
+    let pafLayerStartIndex = 16
+    let modelOutputWidh = 64
+    let modelOutputHeight = 64
+    let modelInputSize = CGSize(width: 512, height: 512)
     let scoreThreasholdFactor = Float32(2)
+    
+    var saveDebugImages: Bool = false
     var timeElapsedString: String = ""
-    let model: MLModel
+    private var coremlProcessingStart = Date()
+    private var coremlProcessingFinish = Date()
+    private let log = SwiftyBeaver.self
     
     public init(model: MLModel) {
         self.model = model
     }
     
-    func stride(x1: Int, y1: Int, x2: Int, y2: Int,
+    private func stride(x1: Int, y1: Int, x2: Int, y2: Int,
                 processBlock: ((Int, Int, Int, Int) -> Void)) {
         var (dx, dy) = (Float(abs(x2 - x1) + 1), Float(abs(y2 - y1) + 1))
         var stepCount = dy
@@ -206,7 +208,7 @@ open class PoseEstimation {
         }
     }
     
-    func score(x1: Int, y1: Int, x2: Int, y2: Int,
+    private func score(x1: Int, y1: Int, x2: Int, y2: Int,
                pafMatX: Array<Float32>, pafMatY: Array<Float32>,
                yStride: Int) -> (Float32, Int) {
         
@@ -253,346 +255,328 @@ open class PoseEstimation {
         let scorePenalty = -localScoreMax
         let filteredLocalScores = localScores.map { localScoreMax / $0 > scoreThreasholdFactor ? scorePenalty: $0 }
         
-        print("scores: [\(localScores)]\nfiltered_scores: [\(filteredLocalScores)]")
+        log.debug("scores: [\(localScores)]\nfiltered_scores: [\(filteredLocalScores)]")
         
         return (filteredLocalScores.reduce(0, +), filteredLocalScores.count )
     }
     
-    func processImage() {
-        guard !running else {
+    public func estimate(on image: UIImage, completion: @escaping (([Int: [JointConnectionWithScore]]) -> ())) {
+        
+        var uiImage = image
+        if image.size != modelInputSize {
+            uiImage = image.resizedCenteredKeepingSpectRatio(toSize: modelInputSize)
+        }
+        guard let ciImage = CIImage(image: uiImage) else {
+            assertionFailure("Failed to create ciImage")
+            completion([:])
             return
         }
-        running = true
         
         do {
-            let uiImage = #imageLiteral(resourceName: "five_people")
             let model = try VNCoreMLModel(for: self.model)
-            //let output = coreModel.modelDescription.outputDescriptionsByName["net_output"]
             let coremlRequest = VNCoreMLRequest(model: model) { request, error in
-                guard let observations = request.results as? [VNCoreMLFeatureValueObservation] else {
-                    print("Unknown results for request: \(request)")
-                    return
-                }
-                let multiArray = observations.first!.featureValue.multiArrayValue
-                withExtendedLifetime(multiArray) {
-                    self.coremlProcessingFinish = Date()
-                    
-                    if let multiArray = try? multiArray?.reshaped(to: [self.layersCount,
-                                                                       self.outputWidh,
-                                                                       self.outputHeight]),
-                        let reshapedArray = multiArray {
+                
+                do {
+                    guard let observations = request.results as? [VNCoreMLFeatureValueObservation] else {
+                        assertionFailure("Unknown results for CoreML request: \(request)")
+                        return
+                    }
+                    let multiArray = observations.first!.featureValue.multiArrayValue
+                    try withExtendedLifetime(multiArray) {
+                        self.coremlProcessingFinish = Date()
                         
-                        var images:[UIImage] = []
-                        let nnOutput = UnsafeMutablePointer<Float32>(OpaquePointer(reshapedArray.dataPointer))
-                        let layerStride = reshapedArray.strides[0].intValue
-                        let heatMatCount = self.backgroundLayerIndex
-                        
-                        // Draw heatmap matrices
-                        let heatMatPtr = nnOutput
-                        images.append(heatMatPtr.drawMatricesCombined(matricesCount: heatMatCount,
-                                                                      width: self.outputWidh,
-                                                                      height: self.outputHeight,
-                                                                      colors: Pose.colors))
-                        
-                        // Do a second round filtering by applying a threshold
-                        let arr = Array(UnsafeBufferPointer(start: heatMatPtr, count: heatMatCount * layerStride))
-                        let avg = arr.reduce(0, +) / Float32(arr.count)
-                        let NMS_Threshold: Float32 = 0.1
-                        var _NMS_Threshold = max(avg * 4.0, NMS_Threshold)
-                        _NMS_Threshold = min(_NMS_Threshold, 0.3)
-                        var candidates:[HeatMapJointCandidate] = []
-                        for layerIndex in 0..<heatMatCount {
-                            let layerPtr = heatMatPtr.advanced(by: layerIndex * layerStride)
-                            for idx in 0..<layerStride {
-                                if layerPtr[idx] > _NMS_Threshold {
-                                    let col = idx % self.outputWidh
-                                    let row = idx / self.outputWidh
-                                    candidates.append(HeatMapJointCandidate(col: col,
-                                                                            row: row,
-                                                                            layerIndex: layerIndex,
-                                                                            confidence: layerPtr[idx]))
-                                }
+                        if let multiArray = try? multiArray?.reshaped(to: [self.layersCount,
+                                                                           self.modelOutputWidh,
+                                                                           self.modelOutputHeight]),
+                            let reshapedArray = multiArray {
+
+                            let nnOutput = UnsafeMutablePointer<Float32>(OpaquePointer(reshapedArray.dataPointer))
+                            let layerStride = reshapedArray.strides[0].intValue
+                            let heatMatCount = self.backgroundLayerIndex
+                            
+                            // Draw heatmap matrices
+                            let heatMatPtr = nnOutput
+                            if self.saveDebugImages {
+                                try heatMatPtr.drawMatricesCombined(matricesCount: heatMatCount,
+                                                                              width: self.modelOutputWidh,
+                                                                              height: self.modelOutputHeight,
+                                                                              colors: Pose.colors).save(tofileName: "heatMapMatrices")
                             }
-                        }
-                        
-                        // Draw heatmap candidates for joints after filtering
-                        // Use alpha to show candiates that are overlapping
-                        images.append(candidates.draw(width: self.outputWidh,
-                                                      height: self.outputHeight,
-                                                      alpha: 0.8,
-                                                      radius: 7.0,
-                                                      on: UIImage.image(with: .white, size: uiImage.size)))
-                        
-                        var filteredCandidates: [HeatMapJointCandidate] = []
-                        
-                        for layerIndex in (0..<heatMatCount) {
-                            let candidates = candidates.filter { $0.layerIndex == layerIndex }
-                            // Non maximum suppression to get as minimum candidates as possible
-                            let boxes = candidates.map { c -> BoundingBox in
-                                let windowOrigin = CGPoint(x: max(0, c.col - 2), y: max(0, c.row - 2))
-                                let windowSize = CGSize(width: 5, height: 5)
-                                return BoundingBox(classIndex: 0,
-                                                   score: Float(c.confidence),
-                                                   rect: CGRect(origin: windowOrigin, size: windowSize))
-                            }
-                            let boxIndices = nonMaxSuppression(boundingBoxes: boxes, iouThreshold: 0.3, maxBoxes: boxes.count)
-                            filteredCandidates += boxIndices.map { candidates[$0] }
                             
-                            /*
-                             let centerCount = boxIndices.count
-                             // K means
-                             if centerCount > 0 {
-                             let kmm = KMeans<Int>(labels: [Int](0..<centerCount))
-                             let points = candidates.map { c -> KMClusteringVector in
-                             return KMClusteringVector([Float(c.col), Float(c.row)])
-                             }
-                             kmm.trainCenters(points: points, convergeDistance: 0.01)
-                             let filteredCandidatesForLayer = kmm.centroids.compactMap {
-                             HeatMapJointCandidate(col: Int($0.data[0].rounded(.toNearestOrAwayFromZero)),
-                             row: Int($0.data[1].rounded(.toNearestOrAwayFromZero)),
-                             layerIndex: layerIndex,
-                             confidence: 1.0) }
-                             filteredCandidates += filteredCandidatesForLayer
-                             
-                             // Draw candidates
-                             let candidatesImage = candidates.draw(width: self.outputWidh,
-                             height: self.outputHeight,
-                             alpha: 0.8,
-                             radius: 15.0,
-                             on: UIImage.image(with: .white, size: uiImage.size))
-                             images.append(filteredCandidatesForLayer.draw(width: self.outputWidh,
-                             height: self.outputHeight,
-                             radius: 15,
-                             lineWidth: 4,
-                             on: candidatesImage))
-                             }
-                             */
-                        }
-                        
-                        // Draw filtered joint candidates
-                        images.append(filteredCandidates.draw(width: self.outputWidh,
-                                                              height: self.outputHeight,
-                                                              radius: 7,
-                                                              on: UIImage.image(with: .white, size: uiImage.size)))
-                        
-                        let pose = PoseMPI15()
-                        // Map layerIndex to joint type
-                        let candidatesByJoints = Dictionary(grouping: filteredCandidates, by: { pose.joints[$0.layerIndex] })
-                        
-                        // Get joint connections with scores based on PAF matrices
-                        var allConnectionCandidates: [JointConnectionWithScore] = []
-                        var connections: [JointConnectionWithScore] = []
-                        
-                        pose.jointConnections.forEach { connection in
-                            
-                            let (indexX, indexY) = connection.pafIndices
-                            let pafMatX = nnOutput.array(idx: self.pafLayerIndex + indexX,
-                                                         stride: layerStride)
-                            let pafMatY = nnOutput.array(idx: self.pafLayerIndex + indexY,
-                                                         stride: layerStride)
-                            
-                            let (joint1, joint2) = (connection.joints.0, connection.joints.1)
-                            
-                            if let candidate1 = candidatesByJoints[joint1],
-                                let candidate2 = candidatesByJoints[joint2] {
-                                
-                                var connectionCandidates: [JointConnectionWithScore] = []
-                                
-                                // Get non filtered joint connections
-                                candidate1.enumerated().forEach { offset1, first in
-                                    candidate2.enumerated().forEach { offset2, second in
-                                        
-                                        let (x1, y1) = (first.col, first.row)
-                                        let (x2, y2) = (second.col, second.row)
-                                        
-                                        let (s, c) = self.score(x1: x1, y1: y1, x2: x2, y2: y2,
-                                                                pafMatX: pafMatX, pafMatY: pafMatY,
-                                                                yStride: self.outputWidh)
-                                        if s > 0 {
-                                            let connWithCoords = JointConnectionWithScore(connection: connection,
-                                                                                          score: s,
-                                                                                          count: c,
-                                                                                          offsetJoint1: offset1,
-                                                                                          offsetJoint2: offset2,
-                                                                                          joint1: JointPoint(x: x1, y: y1),
-                                                                                          joint2: JointPoint(x: x2, y: y2))
-                                            connectionCandidates.append(connWithCoords)
-                                        }
-                                        print("\(connection) \(s) \(c) \(x1) \(y1) \(x2) \(y2)")
+                            // Do a second round filtering by applying a threshold
+                            let arr = Array(UnsafeBufferPointer(start: heatMatPtr, count: heatMatCount * layerStride))
+                            let avg = arr.reduce(0, +) / Float32(arr.count)
+                            let NMS_Threshold: Float32 = 0.1
+                            var _NMS_Threshold = max(avg * 4.0, NMS_Threshold)
+                            _NMS_Threshold = min(_NMS_Threshold, 0.3)
+                            var candidates:[HeatMapJointCandidate] = []
+                            for layerIndex in 0..<heatMatCount {
+                                let layerPtr = heatMatPtr.advanced(by: layerIndex * layerStride)
+                                for idx in 0..<layerStride {
+                                    if layerPtr[idx] > _NMS_Threshold {
+                                        let col = idx % self.modelOutputWidh
+                                        let row = idx / self.modelOutputWidh
+                                        candidates.append(HeatMapJointCandidate(col: col,
+                                                                                row: row,
+                                                                                layerIndex: layerIndex,
+                                                                                confidence: layerPtr[idx]))
                                     }
                                 }
+                            }
+                            
+                            if self.saveDebugImages {
+                                let backgroundLayer = nnOutput.array(idx: self.backgroundLayerIndex, stride: layerStride)
+                                // Draw heatmap candidates for joints after filtering
+                                // Use alpha to show candiates that are overlapping
+                                try candidates.draw(width: self.modelOutputWidh,
+                                                              height: self.modelOutputHeight,
+                                                              radius: 3.0,
+                                                              lineWidth: 2.0,
+                                                              on: backgroundLayer.draw(width: self.modelOutputWidh,
+                                                                                       height: self.modelOutputHeight).resized(to: uiImage.size)).save(tofileName: "allCandidates")
+                            }
+                            
+                            var filteredCandidates: [HeatMapJointCandidate] = []
+                            
+                            for layerIndex in (0..<heatMatCount) {
+                                let candidates = candidates.filter { $0.layerIndex == layerIndex }
+                                // Non maximum suppression to get as minimum candidates as possible
+                                let boxes = candidates.map { c -> BoundingBox in
+                                    let windowOrigin = CGPoint(x: max(0, c.col - 2), y: max(0, c.row - 2))
+                                    let windowSize = CGSize(width: 5, height: 5)
+                                    return BoundingBox(classIndex: 0,
+                                                       score: Float(c.confidence),
+                                                       rect: CGRect(origin: windowOrigin, size: windowSize))
+                                }
+                                let boxIndices = nonMaxSuppression(boundingBoxes: boxes, iouThreshold: 0.3, maxBoxes: boxes.count)
+                                filteredCandidates += boxIndices.map { candidates[$0] }
+                            }
+                            
+                            if self.saveDebugImages {
+                                // Draw filtered joint candidates
+                                try filteredCandidates.draw(width: self.modelOutputWidh,
+                                                                      height: self.modelOutputHeight,
+                                                                      radius: 3.0,
+                                                                      lineWidth: 6.0,
+                                                                      on: UIImage.image(with: .white, size: uiImage.size)).save(tofileName: "filteredCandidates")
+                            }
+                            
+                            let pose = PoseMPI15()
+                            // Map layerIndex to joint type
+                            let candidatesByJoints = Dictionary(grouping: filteredCandidates, by: { pose.joints[$0.layerIndex] })
+                            
+                            // Get joint connections with scores based on PAF matrices
+                            var allConnectionCandidates: [JointConnectionWithScore] = []
+                            var connections: [JointConnectionWithScore] = []
+                            
+                            try pose.jointConnections.forEach { connection in
                                 
-                                let pafXImage = pafMatX.draw(width: self.outputWidh, height: self.outputHeight)
-                                let pafYImage = pafMatY.draw(width: self.outputWidh, height: self.outputHeight)
+                                let (indexX, indexY) = connection.pafIndices
+                                let pafMatX = nnOutput.array(idx: self.pafLayerStartIndex + indexX,
+                                                             stride: layerStride)
+                                let pafMatY = nnOutput.array(idx: self.pafLayerStartIndex + indexY,
+                                                             stride: layerStride)
                                 
-                                let joints1 = filteredCandidates.filter({ $0.layerIndex == connection.joints.0.index()})
-                                let joints2 = filteredCandidates.filter({ $0.layerIndex == connection.joints.1.index()})
-                                let jointCandidates1 = candidates.filter({ $0.layerIndex == connection.joints.0.index()})
-                                let jointCandidates2 = candidates.filter({ $0.layerIndex == connection.joints.1.index()})
+                                let (joint1, joint2) = (connection.joints.0, connection.joints.1)
                                 
-                                let jointConns = connectionCandidates.filter({ $0.connection == connection })
-                                
-                                
-                                let (heatMapIndex1, heatMapIndex2) = (connection.joints.0.index(),
-                                                                      connection.joints.1.index())
-                                let heatMap1 = nnOutput.array(idx: heatMapIndex1,
-                                                              stride: layerStride)
-                                let heatMap2 = nnOutput.array(idx: heatMapIndex2,
-                                                              stride: layerStride)
-                                var heatMap1Image = heatMap1.draw(width: self.outputWidh, height: self.outputHeight)
-                                var heatMap2Image = heatMap2.draw(width: self.outputWidh, height: self.outputHeight)
-                                
-                                heatMap1Image = joints1.draw(width: self.outputWidh,
-                                                             height: self.outputHeight,
-                                                             radius: 5,
-                                                             lineWidth: 3,
-                                                             on: heatMap1Image.resized(to: uiImage.size))
-                                images.append(jointCandidates1.draw(width: self.outputWidh,
-                                                                    height: self.outputHeight,
-                                                                    radius: 5,
-                                                                    lineWidth: 0.5,
-                                                                    on: heatMap1Image))
-                                
-                                heatMap2Image = joints2.draw(width: self.outputWidh,
-                                                             height: self.outputHeight,
-                                                             radius: 5,
-                                                             lineWidth: 3,
-                                                             on: heatMap2Image.resized(to: uiImage.size))
-                                images.append(jointCandidates2.draw(width: self.outputWidh,
-                                                                    height: self.outputHeight,
-                                                                    radius: 5,
-                                                                    lineWidth: 0.5,
-                                                                    on: heatMap2Image))
-                                
-                                images.append(joints1.draw(width: self.outputWidh,
-                                                           height: self.outputHeight,
-                                                           radius: 7,
-                                                           lineWidth: 3,
-                                                           on: pafXImage.resized(to: uiImage.size)))
-                                images.append(joints2.draw(width: self.outputWidh,
-                                                           height: self.outputHeight,
-                                                           radius: 7,
-                                                           lineWidth: 3,
-                                                           on: pafYImage.resized(to: uiImage.size)))
-                                images.append(jointConns.draw(width: self.outputWidh,
-                                                              height: self.outputHeight,
-                                                              lineWidth: 3,
-                                                              on: pafXImage.resized(to: uiImage.size)))
-                                images.append(jointConns.draw(width: self.outputWidh,
-                                                              height: self.outputHeight,
-                                                              lineWidth: 3,
-                                                              on: pafYImage.resized(to: uiImage.size)))
-                                
-                                allConnectionCandidates += connectionCandidates
-                                
-                                var (usedIdx1, usedIdx2) = (Set<Int>(), Set<Int>())
-                                connectionCandidates.sorted(by: { $0.score > $1.score }).forEach { c in
-                                    if usedIdx1.contains(c.offsetJoint1) || usedIdx2.contains(c.offsetJoint2) {
+                                if let candidate1 = candidatesByJoints[joint1],
+                                    let candidate2 = candidatesByJoints[joint2] {
+                                    
+                                    var connectionCandidates: [JointConnectionWithScore] = []
+                                    
+                                    // Get non filtered joint connections
+                                    candidate1.enumerated().forEach { offset1, first in
+                                        candidate2.enumerated().forEach { offset2, second in
+                                            
+                                            let (x1, y1) = (first.col, first.row)
+                                            let (x2, y2) = (second.col, second.row)
+                                            
+                                            let (s, c) = self.score(x1: x1, y1: y1, x2: x2, y2: y2,
+                                                                    pafMatX: pafMatX, pafMatY: pafMatY,
+                                                                    yStride: self.modelOutputWidh)
+                                            if s > 0 {
+                                                let connWithCoords = JointConnectionWithScore(connection: connection,
+                                                                                              score: s,
+                                                                                              count: c,
+                                                                                              offsetJoint1: offset1,
+                                                                                              offsetJoint2: offset2,
+                                                                                              joint1: JointPoint(x: x1, y: y1),
+                                                                                              joint2: JointPoint(x: x2, y: y2))
+                                                connectionCandidates.append(connWithCoords)
+                                            }
+                                            self.log.debug("\(connection) \(s) \(c) \(x1) \(y1) \(x2) \(y2)")
+                                        }
+                                    }
+                                    
+                                    if self.saveDebugImages {
+                                        let pafXImage = pafMatX.draw(width: self.modelOutputWidh, height: self.modelOutputHeight)
+                                        let pafYImage = pafMatY.draw(width: self.modelOutputWidh, height: self.modelOutputHeight)
+                                        
+                                        let joints1 = filteredCandidates.filter({ $0.layerIndex == connection.joints.0.index()})
+                                        let joints2 = filteredCandidates.filter({ $0.layerIndex == connection.joints.1.index()})
+                                        let jointCandidates1 = candidates.filter({ $0.layerIndex == connection.joints.0.index()})
+                                        let jointCandidates2 = candidates.filter({ $0.layerIndex == connection.joints.1.index()})
+                                        
+                                        let jointConns = connectionCandidates.filter({ $0.connection == connection })
+                                        
+                                        
+                                        let (heatMapIndex1, heatMapIndex2) = (connection.joints.0.index(),
+                                                                              connection.joints.1.index())
+                                        let heatMap1 = nnOutput.array(idx: heatMapIndex1,
+                                                                      stride: layerStride)
+                                        let heatMap2 = nnOutput.array(idx: heatMapIndex2,
+                                                                      stride: layerStride)
+                                        var heatMap1Image = heatMap1.draw(width: self.modelOutputWidh, height: self.modelOutputHeight)
+                                        var heatMap2Image = heatMap2.draw(width: self.modelOutputWidh, height: self.modelOutputHeight)
+                                        
+                                        heatMap1Image = joints1.draw(width: self.modelOutputWidh,
+                                                                     height: self.modelOutputHeight,
+                                                                     alpha: 1.0,
+                                                                     radius: 5,
+                                                                     lineWidth: 3,
+                                                                     on: heatMap1Image.resized(to: uiImage.size))
+                                        try jointCandidates1.draw(width: self.modelOutputWidh,
+                                                                            height: self.modelOutputHeight,
+                                                                            radius: 5,
+                                                                            lineWidth: 0.5,
+                                                                            on: heatMap1Image).save(tofileName: "jointCandidates1")
+                                        
+                                        heatMap2Image = joints2.draw(width: self.modelOutputWidh,
+                                                                     height: self.modelOutputHeight,
+                                                                     alpha: 1.0,
+                                                                     radius: 5,
+                                                                     lineWidth: 3,
+                                                                     on: heatMap2Image.resized(to: uiImage.size))
+                                        try jointCandidates2.draw(width: self.modelOutputWidh,
+                                                                            height: self.modelOutputHeight,
+                                                                            radius: 5,
+                                                                            lineWidth: 0.5,
+                                                                            on: heatMap2Image).save(tofileName: "jointCandidates2")
+                                        
+                                        try joints1.draw(width: self.modelOutputWidh,
+                                                                   height: self.modelOutputHeight,
+                                                                   alpha: 1.0,
+                                                                   radius: 7,
+                                                                   lineWidth: 3,
+                                                                   on: pafXImage.resized(to: uiImage.size)).save(tofileName: "allJointsX")
+                                        try joints2.draw(width: self.modelOutputWidh,
+                                                                   height: self.modelOutputHeight,
+                                                                   alpha: 1.0,
+                                                                   radius: 7,
+                                                                   lineWidth: 3,
+                                                                   on: pafYImage.resized(to: uiImage.size)).save(tofileName: "allJointsY")
+                                        try jointConns.draw(width: self.modelOutputWidh,
+                                                                      height: self.modelOutputHeight,
+                                                                      lineWidth: 3,
+                                                                      on: pafXImage.resized(to: uiImage.size)).save(tofileName: "allConnectionsX")
+                                        try jointConns.draw(width: self.modelOutputWidh,
+                                                                      height: self.modelOutputHeight,
+                                                                      lineWidth: 3,
+                                                                      on: pafYImage.resized(to: uiImage.size)).save(tofileName: "allConnectionsY")
+                                    }
+                                    allConnectionCandidates += connectionCandidates
+                                    
+                                    var (usedIdx1, usedIdx2) = (Set<Int>(), Set<Int>())
+                                    connectionCandidates.sorted(by: { $0.score > $1.score }).forEach { c in
+                                        if usedIdx1.contains(c.offsetJoint1) || usedIdx2.contains(c.offsetJoint2) {
+                                            return
+                                        }
+                                        connections.append(c)
+                                        usedIdx1.insert(c.offsetJoint1)
+                                        usedIdx2.insert(c.offsetJoint2)
+                                    }
+                                }
+                            }
+                            
+                            if self.saveDebugImages {
+                                // Draw connecions with score
+                                let allConnectionsImage = allConnectionCandidates.draw(width: self.modelOutputWidh,
+                                                                                       height: self.modelOutputHeight,
+                                                                                       lineWidth: 5,
+                                                                                       on: UIImage.image(with: .white, size: uiImage.size))
+                                // Draw joints
+                                try filteredCandidates.draw(width: self.modelOutputWidh,
+                                                                      height: self.modelOutputHeight,
+                                                                      radius: 5,
+                                                                      lineWidth: 3,
+                                                                      on: allConnectionsImage).save(tofileName: "filteredCandidatesWithConnections")
+                            }
+                            // Group connections by human.
+                            var humanJoints: [Set<JointPoint>] = []
+                            var humanConnections: [Int: [JointConnectionWithScore]] = [:]
+                            connections.enumerated().forEach { connIdx, c in
+                                var added = false
+                                (0..<humanJoints.count).forEach { humanIdx in
+                                    let conn = humanJoints[humanIdx]
+                                    if (conn.contains(c.joint1) && !conn.contains(c.joint2)) ||
+                                        (conn.contains(c.joint2) && !conn.contains(c.joint1)) {
+                                        humanJoints[humanIdx].insert(c.joint1)
+                                        humanJoints[humanIdx].insert(c.joint2)
+                                        humanConnections[humanIdx]?.append(c)
+                                        added = true
                                         return
                                     }
-                                    connections.append(c)
-                                    usedIdx1.insert(c.offsetJoint1)
-                                    usedIdx2.insert(c.offsetJoint2)
+                                }
+                                if !added {
+                                    humanJoints.append([c.joint1, c.joint2])
+                                    humanConnections[humanJoints.count - 1] = [c]
                                 }
                             }
-                        }
-                        
-                        // Draw connecions with score
-                        let allConnectionsImage = allConnectionCandidates.draw(width: self.outputWidh,
-                                                                               height: self.outputHeight,
-                                                                               lineWidth: 5,
-                                                                               on: UIImage.image(with: .white, size: uiImage.size))
-                        // Draw joints
-                        images.insert(filteredCandidates.draw(width: self.outputWidh,
-                                                              height: self.outputHeight,
-                                                              radius: 5,
-                                                              lineWidth: 3,
-                                                              on: allConnectionsImage), at: 0)
-                        // Group connections by human.
-                        var humanJoints: [Set<JointPoint>] = []
-                        var humanConnections: [Int: [JointConnectionWithScore]] = [:]
-                        connections.enumerated().forEach { connIdx, c in
-                            var added = false
-                            (0..<humanJoints.count).forEach { humanIdx in
-                                let conn = humanJoints[humanIdx]
-                                if (conn.contains(c.joint1) && !conn.contains(c.joint2)) ||
-                                    (conn.contains(c.joint2) && !conn.contains(c.joint1)) {
-                                    humanJoints[humanIdx].insert(c.joint1)
-                                    humanJoints[humanIdx].insert(c.joint2)
-                                    humanConnections[humanIdx]?.append(c)
-                                    added = true
-                                    return
+                            
+                            if self.saveDebugImages {
+                                // Draw human joint connection over an original image
+                                var resultImage = uiImage.grayed
+                                humanConnections.forEach { h in
+                                    resultImage = h.value.draw(width: self.modelOutputWidh,
+                                                               height: self.modelOutputHeight,
+                                                               lineWidth: 3,
+                                                               drawJoint: true,
+                                                               alpha: 1.0,
+                                                               on: resultImage)
                                 }
+                                try resultImage.save(tofileName: "humanPoseOverOriginal")
                             }
-                            if !added {
-                                humanJoints.append([c.joint1, c.joint2])
-                                humanConnections[humanJoints.count - 1] = [c]
-                            }
-                        }
-                        
-                        // Draw human joint connection over an original image
-                        var resultImage = uiImage.grayed
-                        humanConnections.forEach { h in
-                            resultImage = h.value.draw(width: self.outputWidh,
-                                                       height: self.outputHeight,
-                                                       lineWidth: 3,
-                                                       drawJoint: true,
-                                                       useAlpha: false,
-                                                       on: resultImage)
-                        }
-                        images.insert(resultImage, at: 0)
-                        
-                        // ======= !!!!! For visualization only !!!!!
-                        // Could be removed after debugging
-                        // Filter each heatmap layer by subtracting a min value
-                        let pafCount = self.layersCount - heatMatCount - 1
-                        for layerIndex in 0..<pafCount {
-                            
-                            let channelArray = nnOutput.advanced(by: (self.pafLayerIndex + layerIndex) * layerStride)
-                            let arr = Array(UnsafeBufferPointer(start: channelArray, count: layerStride))
-                            
-                            let valSet = NSCountedSet(array: arr.map { ($0 * 10000).rounded() })
-                            let hist = valSet.sorted(by: { (a, b) -> Bool in
-                                return valSet.count(for: a) < valSet.count(for: b)
-                            })
-                            if let last = hist.last as? Int {
-                                let maxHist = Float(last) / 10000
-                                for idx in 0..<layerStride {
-                                    if channelArray[idx] < 0 {
-                                        channelArray[idx] = abs(channelArray[idx] - maxHist)
+                            // Filter each heatmap layer by subtracting a min value
+                            let pafCount = self.layersCount - heatMatCount - 1
+                            for layerIndex in 0..<pafCount {
+                                
+                                let channelArray = nnOutput.advanced(by: (self.pafLayerStartIndex + layerIndex) * layerStride)
+                                let arr = Array(UnsafeBufferPointer(start: channelArray, count: layerStride))
+                                
+                                let valSet = NSCountedSet(array: arr.map { ($0 * 10000).rounded() })
+                                let hist = valSet.sorted(by: { (a, b) -> Bool in
+                                    return valSet.count(for: a) < valSet.count(for: b)
+                                })
+                                if let last = hist.last as? Int {
+                                    let maxHist = Float(last) / 10000
+                                    for idx in 0..<layerStride {
+                                        if channelArray[idx] < 0 {
+                                            channelArray[idx] = abs(channelArray[idx] - maxHist)
+                                        }
                                     }
                                 }
                             }
-                        }
-                        let pafArray = nnOutput.advanced(by: self.pafLayerIndex * layerStride)
-                        images.insert(pafArray.drawMatricesCombined(matricesCount: pafCount,
-                                                                    width: self.outputWidh,
-                                                                    height: self.outputHeight,
-                                                                    colors: Pose.colors), at: 2)
-                        // =======!!!!!!!!!
-                        
-                        DispatchQueue.main.async {
-                            self.running = false
-                            let image = uiImage
-                            images.insert(image, at: 0)
-                            self.poseOutputImages = images
+                            if self.saveDebugImages {
+                                let pafArray = nnOutput.advanced(by: self.pafLayerStartIndex * layerStride)
+                                try pafArray.drawMatricesCombined(matricesCount: pafCount,
+                                                                            width: self.modelOutputWidh,
+                                                                            height: self.modelOutputHeight,
+                                                                            colors: Pose.colors).save(tofileName: "PAF")
+                            }
                             let timeElapsed = self.coremlProcessingFinish.timeIntervalSince(self.coremlProcessingStart)
                             let formatter: NumberFormatter = NumberFormatter()
                             formatter.numberStyle = .decimal
                             formatter.maximumFractionDigits = 2
                             self.timeElapsedString = formatter.string(from: NSNumber(value: timeElapsed)) ?? ""
+                            completion(humanConnections)
                         }
                     }
+                } catch {
+                    self.log.error(error)
                 }
             }
-            
             // Set an image scaling mode for the Vision framework
             coremlRequest.imageCropAndScaleOption = .centerCrop
-            
-            guard let ciImage = CIImage(image: uiImage) else {
-                print("Failed to create an image")
-                return
-            }
             // Even though the CoreML model has fixed input image size that is not equal to the real input image the Vision framework will scale it accordingly
             let handler = VNImageRequestHandler(ciImage: ciImage)
             DispatchQueue.global(qos: .userInteractive).async {
@@ -600,12 +584,12 @@ open class PoseEstimation {
                     self.coremlProcessingStart = Date()
                     try handler.perform([coremlRequest])
                 } catch {
-                    print(error)
+                    self.log.error(error)
                 }
             }
         }
         catch {
-            print(error)
+            log.error(error)
         }
     }
 }

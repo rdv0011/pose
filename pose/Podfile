@@ -5,6 +5,7 @@ target 'pose' do
   use_frameworks!
   
   pod 'CoreMLHelpers', :git => 'git://github.com/hollance/CoreMLHelpers'
+  pod 'SwiftyBeaver'
 
 end
 

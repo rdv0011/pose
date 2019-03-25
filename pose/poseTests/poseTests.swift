@@ -7,9 +7,10 @@
 //
 
 import XCTest
+import CoreML
 @testable import pose
 
-class poseTests: XCTestCase {
+class PoseTests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -18,11 +19,23 @@ class poseTests: XCTestCase {
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
+    
+    func testModel() {
+    }
 
     func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        let estimation = PoseEstimation(model: PoseModel().model)
+        guard let testImage = UIImage(named: "five_people", in: Bundle(for: PoseTests.self), compatibleWith: nil) else {
+            assertionFailure("Failed to open image")
+            return
+        }
+        
+        let pose = PoseEstimation(model: PoseModel().model)
+        let estimationCompleted = XCTestExpectation(description: "Pose estimation completed")
+        pose.estimate(on: testImage) { humans in
+            print(humans)
+            estimationCompleted.fulfill()
+        }
+        wait(for: [estimationCompleted], timeout: 50.0)
     }
 
     func testPerformanceExample() {

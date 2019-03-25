@@ -15,9 +15,6 @@
 		0A9EB10F2242DFE70047223E /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB10B2242DFE70047223E /* UIImage+Extension.swift */; };
 		0A9EB1102242DFE70047223E /* UnsafeMutablePointer+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB10C2242DFE70047223E /* UnsafeMutablePointer+Extension.swift */; };
 		0A9EB1112242DFE70047223E /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB10D2242DFE70047223E /* Array+Extension.swift */; };
-		0A9EB1182242DFFD0047223E /* human-pose-joints-and-parts-MPI15.png in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB1142242DFFD0047223E /* human-pose-joints-and-parts-MPI15.png */; };
-		0A9EB1192242DFFD0047223E /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB1152242DFFD0047223E /* README.txt */; };
-		0A9EB11A2242DFFD0047223E /* convertModel.py in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB1162242DFFD0047223E /* convertModel.py */; };
 		0A9EB11C22443EB90047223E /* PoseModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB11B22443EB90047223E /* PoseModel.mlmodel */; };
 		0A9EB124224445E70047223E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB123224445E70047223E /* AppDelegate.swift */; };
 		0A9EB126224445E70047223E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB125224445E70047223E /* ViewController.swift */; };
@@ -26,6 +23,7 @@
 		0A9EB12E224445EB0047223E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB12C224445EB0047223E /* LaunchScreen.storyboard */; };
 		0A9EB135224448490047223E /* pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* pose.framework */; };
 		0A9EB136224448490047223E /* pose.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* pose.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0A9EB13E2247C9C20047223E /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB13D2247C9C20047223E /* Media.xcassets */; };
 		A18470F0FC864696031F19FA /* Pods_pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A263B8CD7F71E206D6743DA /* Pods_pose.framework */; };
 		C25DF385FD390C9612125856 /* Pods_poseTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */; };
 		C4B6A548D54C72EFE454DE7C /* Pods_poseDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE60EB1E80CC2D8F3765F4EB /* Pods_poseDemo.framework */; };
@@ -81,9 +79,6 @@
 		0A9EB10B2242DFE70047223E /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		0A9EB10C2242DFE70047223E /* UnsafeMutablePointer+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnsafeMutablePointer+Extension.swift"; sourceTree = "<group>"; };
 		0A9EB10D2242DFE70047223E /* Array+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
-		0A9EB1142242DFFD0047223E /* human-pose-joints-and-parts-MPI15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "human-pose-joints-and-parts-MPI15.png"; sourceTree = "<group>"; };
-		0A9EB1152242DFFD0047223E /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
-		0A9EB1162242DFFD0047223E /* convertModel.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = convertModel.py; sourceTree = "<group>"; };
 		0A9EB11B22443EB90047223E /* PoseModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = PoseModel.mlmodel; path = CoreMLModels/PoseModel.mlmodel; sourceTree = SOURCE_ROOT; };
 		0A9EB121224445E70047223E /* poseDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = poseDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A9EB123224445E70047223E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -92,6 +87,7 @@
 		0A9EB12A224445EB0047223E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0A9EB12D224445EB0047223E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0A9EB12F224445EB0047223E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0A9EB13D2247C9C20047223E /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		1C0FB54EE83EE13DFA68B461 /* Pods-pose.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pose.release.xcconfig"; path = "Pods/Target Support Files/Pods-pose/Pods-pose.release.xcconfig"; sourceTree = "<group>"; };
 		25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_poseTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B50B1D0C803E6BA4E711B0F /* Pods-poseDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-poseDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-poseDemo/Pods-poseDemo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -136,7 +132,6 @@
 		0A9EB0DB2242D1F70047223E = {
 			isa = PBXGroup;
 			children = (
-				0A9EB1122242DFFD0047223E /* CoreMLModels */,
 				0A9EB1092242DFE70047223E /* Extensions */,
 				0A9EB0E82242D1F80047223E /* Pose.h */,
 				0A9EB0FF2242D45D0047223E /* Pose.swift */,
@@ -165,6 +160,7 @@
 				0A9EB11B22443EB90047223E /* PoseModel.mlmodel */,
 				0A9EB0F32242D1F80047223E /* poseTests.swift */,
 				0A9EB0F52242D1F80047223E /* Info.plist */,
+				0A9EB13D2247C9C20047223E /* Media.xcassets */,
 			);
 			path = poseTests;
 			sourceTree = "<group>";
@@ -178,16 +174,6 @@
 				0A9EB10D2242DFE70047223E /* Array+Extension.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		0A9EB1122242DFFD0047223E /* CoreMLModels */ = {
-			isa = PBXGroup;
-			children = (
-				0A9EB1142242DFFD0047223E /* human-pose-joints-and-parts-MPI15.png */,
-				0A9EB1152242DFFD0047223E /* README.txt */,
-				0A9EB1162242DFFD0047223E /* convertModel.py */,
-			);
-			path = CoreMLModels;
 			sourceTree = "<group>";
 		};
 		0A9EB122224445E70047223E /* poseDemo */ = {
@@ -349,9 +335,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A9EB1192242DFFD0047223E /* README.txt in Resources */,
-				0A9EB11A2242DFFD0047223E /* convertModel.py in Resources */,
-				0A9EB1182242DFFD0047223E /* human-pose-joints-and-parts-MPI15.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -359,6 +342,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A9EB13E2247C9C20047223E /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,10 +367,12 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-poseTests/Pods-poseTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/CoreMLHelpers/CoreMLHelpers.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CoreMLHelpers.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -401,10 +387,12 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-poseDemo/Pods-poseDemo-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/CoreMLHelpers/CoreMLHelpers.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CoreMLHelpers.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyBeaver.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -25,19 +25,26 @@ extension Array where Element == Float {
 }
 
 extension Array where Element == HeatMapJointCandidate {
-    func draw(width: Int, height: Int, alpha: CGFloat = 1.0,
+    func draw(width: Int, height: Int, alpha: CGFloat? = nil,
               radius: CGFloat = 3, lineWidth: CGFloat = 1, on image: UIImage) -> UIImage {
         let kx = CGFloat(image.size.width) / CGFloat(width)
         let ky = CGFloat(image.size.height) / CGFloat(height)
         let (offsetX, offsetY) = (image.size.width / CGFloat(width) / 2,
                                   image.size.height / CGFloat(height) / 2)
         let renderer = UIGraphicsImageRenderer(size: image.size)
+        var min = Float(0)
+        var factor = Float(1.0)
+        let confidences = self.map({ $0.confidence })
+        if let scoreMin = confidences.min(), let max = confidences.max() {
+            factor = Float(1.0) / abs(max - min)
+            min = scoreMin
+        }
         return renderer.image { context in
             image.draw(at: .zero)
             context.cgContext.setLineWidth(lineWidth)
             for c in self {
                 context.cgContext.setStrokeColor(c.color.cgColor)
-                context.cgContext.setAlpha(alpha)
+                context.cgContext.setAlpha(alpha ?? CGFloat((c.confidence - min) * factor))
                 context.cgContext.beginPath()
                 let x = CGFloat(c.col) * kx + offsetX - radius
                 let y = CGFloat(c.row) * ky + offsetY - radius
@@ -53,8 +60,9 @@ extension Array where Element == HeatMapJointCandidate {
 extension Array where Element == JointConnectionWithScore {
     
     func draw(width: Int, height: Int, lineWidth: CGFloat = 1,
-              drawJoint: Bool = false, useAlpha: Bool = true,
+              drawJoint: Bool = false, alpha: CGFloat? = nil,
               on image: UIImage) -> UIImage {
+        
         let renderer = UIGraphicsImageRenderer(size: image.size)
         let kx = CGFloat(image.size.width) / CGFloat(width)
         let ky = CGFloat(image.size.height) / CGFloat(height)
@@ -72,9 +80,7 @@ extension Array where Element == JointConnectionWithScore {
                                       image.size.height / CGFloat(height) / 2)
             self.forEach { c in
                 context.cgContext.setStrokeColor(c.connection.color.cgColor)
-                if useAlpha {
-                    context.cgContext.setAlpha(CGFloat((c.score - min) * factor))
-                }
+                context.cgContext.setAlpha(alpha ?? CGFloat((c.score - min) * factor))
                 context.cgContext.setLineWidth(lineWidth)
                 context.cgContext.beginPath()
                 context.cgContext.move(to: CGPoint(x: CGFloat(c.joint1.x) * kx + offsetX,

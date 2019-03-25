@@ -72,4 +72,37 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
+    
+    func resizedCenteredKeepingSpectRatio(toSize: CGSize) -> UIImage {
+        let oldWidth = self.size.width
+        let oldHeight = self.size.height
+        let scaleFactor = self.size.height > self.size.width ?
+            toSize.height / oldHeight : toSize.width / oldWidth
+        let newSize = CGSize(width: oldWidth * scaleFactor, height: size.height * scaleFactor)
+        
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = scale
+        let renderer = UIGraphicsImageRenderer(size: toSize, format: format)
+        let image = renderer.image { _ in
+            draw(in: CGRect(origin: CGPoint(x: 0.5 * (toSize.width - newSize.width),
+                                            y: 0.5 * (toSize.height - newSize.height)),
+                            size: newSize))
+        }
+        return image
+    }
+    
+    func save(tofileName: String) throws {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
+        let fileURL = documentsDirectory.appendingPathComponent(tofileName).deletingPathExtension()
+            .appendingPathExtension("jpg")
+        if let data = self.jpegData(compressionQuality:  1.0),
+            !FileManager.default.fileExists(atPath: fileURL.path) {
+            do {
+                try data.write(to: fileURL)
+            } catch {
+                throw error
+            }
+        }
+    }
 }
