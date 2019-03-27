@@ -22,6 +22,23 @@ extension Array where Element == Float {
         }
         return UIImage(cgImage: image)
     }
+    
+    func drawMatricesCombined(matricesCount: Int, width: Int, height: Int, colors: [UIColor]) -> UIImage {
+        let matStride = width * height
+        var finalImage = UIImage()
+        
+        for idx in stride(from: 0, to: matricesCount, by: 1) {
+            let matArray = Array(self[idx..<Swift.min(matStride, self.count)])
+            let color = colors[idx % colors.count]
+            let image = matArray.draw(width: width, height: height).tinted(with: color)
+            if idx == 0 {
+                finalImage = image
+            } else {
+                finalImage = image.combined(withBacground: finalImage)
+            }
+        }
+        return finalImage
+    }
 }
 
 extension Array where Element == HeatMapJointCandidate {

@@ -24,6 +24,7 @@
 		0A9EB135224448490047223E /* pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* pose.framework */; };
 		0A9EB136224448490047223E /* pose.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* pose.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A9EB13E2247C9C20047223E /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB13D2247C9C20047223E /* Media.xcassets */; };
+		0A9EB140224B4A5D0047223E /* PoseCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB13F224B4A5D0047223E /* PoseCommon.swift */; };
 		A18470F0FC864696031F19FA /* Pods_pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A263B8CD7F71E206D6743DA /* Pods_pose.framework */; };
 		C25DF385FD390C9612125856 /* Pods_poseTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */; };
 		C4B6A548D54C72EFE454DE7C /* Pods_poseDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE60EB1E80CC2D8F3765F4EB /* Pods_poseDemo.framework */; };
@@ -88,6 +89,7 @@
 		0A9EB12D224445EB0047223E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0A9EB12F224445EB0047223E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0A9EB13D2247C9C20047223E /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		0A9EB13F224B4A5D0047223E /* PoseCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseCommon.swift; sourceTree = "<group>"; };
 		1C0FB54EE83EE13DFA68B461 /* Pods-pose.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pose.release.xcconfig"; path = "Pods/Target Support Files/Pods-pose/Pods-pose.release.xcconfig"; sourceTree = "<group>"; };
 		25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_poseTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B50B1D0C803E6BA4E711B0F /* Pods-poseDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-poseDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-poseDemo/Pods-poseDemo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 			children = (
 				0A9EB1092242DFE70047223E /* Extensions */,
 				0A9EB0E82242D1F80047223E /* Pose.h */,
+				0A9EB13F224B4A5D0047223E /* PoseCommon.swift */,
 				0A9EB0FF2242D45D0047223E /* Pose.swift */,
 				0A9EB0E92242D1F80047223E /* Info.plist */,
 				0A9EB0F22242D1F80047223E /* poseTests */,
@@ -461,6 +464,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0A9EB1102242DFE70047223E /* UnsafeMutablePointer+Extension.swift in Sources */,
+				0A9EB140224B4A5D0047223E /* PoseCommon.swift in Sources */,
 				0A9EB1112242DFE70047223E /* Array+Extension.swift in Sources */,
 				0A9EB10F2242DFE70047223E /* UIImage+Extension.swift in Sources */,
 				0A9EB1002242D45D0047223E /* Pose.swift in Sources */,

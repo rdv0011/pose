@@ -11,160 +11,11 @@ import Vision
 import CoreMLHelpers
 import SwiftyBeaver
 
-public struct JointPoint: Hashable {
-    let x: Int
-    let y: Int
-    var hash: Int {
-        return x + y * 2000
-    }
-}
-
-public struct JointConnectionWithScore {
-    let connection: PoseMPI15.JointConnection
-    let score: Float32
-    let count: Int
-    let offsetJoint1: Int
-    let offsetJoint2: Int
-    let joint1: JointPoint
-    let joint2: JointPoint
-}
-
-struct Pose {
-    static var colors: [UIColor] {
-        
-        let colorLiterals = [0xFF0055, 0xFF0000, 0xFF5500,
-                             0xFFAA00, 0xFFFF00, 0xAAFF00,
-                             0x55FF00, 0x2BFF00, 0x00FF00,
-                             0x00FF55, 0x00FFAA, 0x00FFFF,
-                             0x00AAFF, 0x0055FF, 0xAA00FF,
-                             0xFF00FF, 0xFF00AA, 0xFF0055]
-        return colorLiterals.map { UIColor(hex: $0) }
-    }
-}
-
-enum BodyJoint: String, CaseIterable {
-    case head, neck,
-    rShoulder, rElbow, rWrist,
-    lShoulder, lElbow, lWrist,
-    rHip, rKnee, rAnkle,
-    lHip, lKnee, lAnkle,
-    chest, background
-    
-    static var array: [BodyJoint] { return self.allCases }
-    
-    var color: UIColor {
-        return Pose.colors[index()]
-    }
-    
-    func index() -> Int {
-        return BodyJoint.array.firstIndex(of: self)!
-    }
-}
-
-public struct PoseMPI15 {
-    var joints = BodyJoint.array
-    var jointConnections = JointConnection.array
-    
-    enum JointConnection: String, CaseIterable {
-        case headNeck,
-        neckRShoulder, rShoulderRElbow, rElbowRWrist,
-        neckLShoulder, lShoulderLElbow, lElbowLWrist,
-        neckChest,
-        chestRHip, rHipRKnee, rKneeRAnkle,
-        chestLHip, lHipLKnee, lKneeLAnkle
-        
-        static var array: [JointConnection] { return self.allCases }
-        
-        var joints: (BodyJoint, BodyJoint) {
-            switch self {
-            case .headNeck:
-                return (.head, .neck)
-            case .neckRShoulder:
-                return (.neck, .rShoulder)
-            case .rShoulderRElbow:
-                return (.rShoulder, .rElbow)
-            case .rElbowRWrist:
-                return (.rElbow, .rWrist)
-            case .neckLShoulder:
-                return (.neck, .lShoulder)
-            case .lShoulderLElbow:
-                return (.lShoulder, .lElbow)
-            case .lElbowLWrist:
-                return (.lElbow, .lWrist)
-            case .neckChest:
-                return (.neck, .chest)
-            case .chestRHip:
-                return (.chest, .rHip)
-            case .rHipRKnee:
-                return (.rHip, .rKnee)
-            case .rKneeRAnkle:
-                return (.rKnee, .rAnkle)
-            case .chestLHip:
-                return (.chest, .lHip)
-            case .lHipLKnee:
-                return (.lHip, .lKnee)
-            case .lKneeLAnkle:
-                return (.lKnee, .lAnkle)
-            }
-        }
-        
-        var pafIndices: (x: Int, y: Int) {
-            switch self {
-            case .headNeck:
-                return (x: 0, y: 1)
-            case .neckRShoulder:
-                return (x: 2, y: 3)
-            case .rShoulderRElbow:
-                return (x: 4, y: 5)
-            case .rElbowRWrist:
-                return (x: 6, y: 7)
-            case .neckLShoulder:
-                return (x: 8, y: 9)
-            case .lShoulderLElbow:
-                return (x: 10, y: 11)
-            case .lElbowLWrist:
-                return (x: 12, y: 13)
-            case .neckChest:
-                return (x: 14, y: 15)
-            case .chestRHip:
-                return (x: 16, y: 17)
-            case .rHipRKnee:
-                return (x: 18, y: 19)
-            case .rKneeRAnkle:
-                return (x: 20, y: 21)
-            case .chestLHip:
-                return (x: 22, y: 23)
-            case .lHipLKnee:
-                return (x: 24, y: 25)
-            case .lKneeLAnkle:
-                return (x: 26, y: 27)
-            }
-        }
-        
-        var color: UIColor {
-            return self.joints.1.color
-        }
-        
-        func index() -> Int {
-            return JointConnection.array.firstIndex(of: self)!
-        }
-    }
-}
-
-struct HeatMapJointCandidate {
-    let col: Int
-    let row: Int
-    let layerIndex: Int
-    let confidence: Float32
-    
-    var color: UIColor {
-        return Pose.colors[layerIndex % Pose.colors.count]
-    }
-}
-
 open class PoseEstimation {
 
     let model: MLModel
+    
+    // Model MPI15 configuration
     let layersCount = 44
     let backgroundLayerIndex = 15
     let pafLayerStartIndex = 16
@@ -172,12 +23,41 @@ open class PoseEstimation {
     let modelOutputHeight = 64
     let modelInputSize = CGSize(width: 512, height: 512)
     let scoreThreasholdFactor = Float32(2)
+    //// End configuration
     
-    var saveDebugImages: Bool = false
-    var timeElapsedString: String = ""
     private var coremlProcessingStart = Date()
     private var coremlProcessingFinish = Date()
     private let log = SwiftyBeaver.self
+    
+    public var saveDebugImages: Bool = false
+    public var coreMLProcessingTime: String {
+        let timeElapsed = coremlProcessingFinish.timeIntervalSince(coremlProcessingStart)
+        let formatter: NumberFormatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        return formatter.string(from: NSNumber(value: timeElapsed)) ?? ""
+    }
+    private(set) var networkOutput: Array<Float> = []
+    public var heatmapMatricesCombined: UIImage {
+        let heatMatCount = self.backgroundLayerIndex
+        return networkOutput.drawMatricesCombined(matricesCount: heatMatCount,
+                                               width: self.modelOutputWidh,
+                                               height: self.modelOutputHeight,
+                                               colors: Pose.colors)
+    }
+    private(set) var heatMapCandidates: [HeatMapJointCandidate]
+    public var heatMapCandidatesImage: UIImage {
+        let layerStride =  modelOutputWidh * modelOutputHeight
+        let backgroundLayer = Array(networkOutput[self.backgroundLayerIndex..<layerStride])
+        // Draw heatmap candidates for joints after filtering
+        // Use alpha to show candiates that are overlapping
+        return heatMapCandidates.draw(width: self.modelOutputWidh,
+                            height: self.modelOutputHeight,
+                            radius: 3.0,
+                            lineWidth: 2.0,
+                            on: backgroundLayer.draw(width: self.modelOutputWidh,
+                                                     height: self.modelOutputHeight).resized(to: modelInputSize))
+    }
     
     public init(model: MLModel) {
         self.model = model
@@ -276,6 +156,8 @@ open class PoseEstimation {
             let model = try VNCoreMLModel(for: self.model)
             let coremlRequest = VNCoreMLRequest(model: model) { request, error in
                 
+                self.coremlProcessingFinish = Date()
+                
                 do {
                     guard let observations = request.results as? [VNCoreMLFeatureValueObservation] else {
                         assertionFailure("Unknown results for CoreML request: \(request)")
@@ -283,7 +165,6 @@ open class PoseEstimation {
                     }
                     let multiArray = observations.first!.featureValue.multiArrayValue
                     try withExtendedLifetime(multiArray) {
-                        self.coremlProcessingFinish = Date()
                         
                         if let multiArray = try? multiArray?.reshaped(to: [self.layersCount,
                                                                            self.modelOutputWidh,
@@ -293,53 +174,37 @@ open class PoseEstimation {
                             let nnOutput = UnsafeMutablePointer<Float32>(OpaquePointer(reshapedArray.dataPointer))
                             let layerStride = reshapedArray.strides[0].intValue
                             let heatMatCount = self.backgroundLayerIndex
-                            
-                            // Draw heatmap matrices
                             let heatMatPtr = nnOutput
+                            
                             if self.saveDebugImages {
-                                try heatMatPtr.drawMatricesCombined(matricesCount: heatMatCount,
-                                                                              width: self.modelOutputWidh,
-                                                                              height: self.modelOutputHeight,
-                                                                              colors: Pose.colors).save(tofileName: "heatMapMatrices")
+                                // Convert a network output to an array for debugging purposes
+                                self.networkOutput = Array(UnsafeBufferPointer(start: nnOutput.advanced(by: 0), count: self.layersCount * layerStride))
                             }
                             
-                            // Do a second round filtering by applying a threshold
+                            // Filter the network output by applying a threshold
                             let arr = Array(UnsafeBufferPointer(start: heatMatPtr, count: heatMatCount * layerStride))
                             let avg = arr.reduce(0, +) / Float32(arr.count)
                             let NMS_Threshold: Float32 = 0.1
                             var _NMS_Threshold = max(avg * 4.0, NMS_Threshold)
                             _NMS_Threshold = min(_NMS_Threshold, 0.3)
-                            var candidates:[HeatMapJointCandidate] = []
+                            self.heatMapCandidates = []
                             for layerIndex in 0..<heatMatCount {
                                 let layerPtr = heatMatPtr.advanced(by: layerIndex * layerStride)
                                 for idx in 0..<layerStride {
                                     if layerPtr[idx] > _NMS_Threshold {
                                         let col = idx % self.modelOutputWidh
                                         let row = idx / self.modelOutputWidh
-                                        candidates.append(HeatMapJointCandidate(col: col,
+                                        self.heatMapCandidates.append(HeatMapJointCandidate(col: col,
                                                                                 row: row,
                                                                                 layerIndex: layerIndex,
                                                                                 confidence: layerPtr[idx]))
                                     }
                                 }
                             }
-                            
-                            if self.saveDebugImages {
-                                let backgroundLayer = nnOutput.array(idx: self.backgroundLayerIndex, stride: layerStride)
-                                // Draw heatmap candidates for joints after filtering
-                                // Use alpha to show candiates that are overlapping
-                                try candidates.draw(width: self.modelOutputWidh,
-                                                              height: self.modelOutputHeight,
-                                                              radius: 3.0,
-                                                              lineWidth: 2.0,
-                                                              on: backgroundLayer.draw(width: self.modelOutputWidh,
-                                                                                       height: self.modelOutputHeight).resized(to: uiImage.size)).save(tofileName: "allCandidates")
-                            }
-                            
+                            // Continue filtering using a non maximum suppression approach
                             var filteredCandidates: [HeatMapJointCandidate] = []
-                            
                             for layerIndex in (0..<heatMatCount) {
-                                let candidates = candidates.filter { $0.layerIndex == layerIndex }
+                                let candidates = self.heatMapCandidates.filter { $0.layerIndex == layerIndex }
                                 // Non maximum suppression to get as minimum candidates as possible
                                 let boxes = candidates.map { c -> BoundingBox in
                                     let windowOrigin = CGPoint(x: max(0, c.col - 2), y: max(0, c.row - 2))
@@ -563,11 +428,6 @@ open class PoseEstimation {
                                                                             height: self.modelOutputHeight,
                                                                             colors: Pose.colors).save(tofileName: "PAF")
                             }
-                            let timeElapsed = self.coremlProcessingFinish.timeIntervalSince(self.coremlProcessingStart)
-                            let formatter: NumberFormatter = NumberFormatter()
-                            formatter.numberStyle = .decimal
-                            formatter.maximumFractionDigits = 2
-                            self.timeElapsedString = formatter.string(from: NSNumber(value: timeElapsed)) ?? ""
                             completion(humanConnections)
                         }
                     }
