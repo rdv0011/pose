@@ -58,7 +58,25 @@ enum BodyJoint: String, CaseIterable {
     }
 }
 
-public struct PoseMPI15 {
+public protocol PoseModel {
+    var layersCount: Int { get }
+    var backgroundLayerIndex: Int { get }
+    var pafLayerStartIndex: Int { get }
+    var outputWidh: Int { get }
+    var outputHeight: Int { get }
+    var inputSize: CGSize { get }
+    var scoreThreasholdFactor: Float { get }
+}
+
+public struct PoseMPI15: PoseModel {
+    public let layersCount = 44
+    public let backgroundLayerIndex = 15
+    public let pafLayerStartIndex = 16
+    public let outputWidh = 64
+    public let outputHeight = 64
+    public let inputSize = CGSize(width: 512, height: 512)
+    public let scoreThreasholdFactor = Float32(2)
+    
     var joints = BodyJoint.array
     var jointConnections = JointConnection.array
     
