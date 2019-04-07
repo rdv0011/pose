@@ -17,7 +17,7 @@ public struct JointPoint: Hashable {
 }
 
 public struct JointConnectionWithScore {
-    let connection: PoseMPI15.JointConnection
+    let connection: PoseModelConfigurationMPI15.JointConnection
     let score: Float32
     let count: Int
     let offsetJoint1: Int
@@ -58,7 +58,7 @@ enum BodyJoint: String, CaseIterable {
     }
 }
 
-public protocol PoseModel {
+public protocol PoseModelConfiguration {
     var layersCount: Int { get }
     var backgroundLayerIndex: Int { get }
     var pafLayerStartIndex: Int { get }
@@ -68,7 +68,7 @@ public protocol PoseModel {
     var scoreThreasholdFactor: Float { get }
 }
 
-public struct PoseMPI15: PoseModel {
+public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
     public let layersCount = 44
     public let backgroundLayerIndex = 15
     public let pafLayerStartIndex = 16

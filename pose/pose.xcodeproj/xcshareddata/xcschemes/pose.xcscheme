@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0A9EB0E42242D1F80047223E"
-               BuildableName = "pose.framework"
-               BlueprintName = "pose"
+               BuildableName = "Pose.framework"
+               BlueprintName = "Pose"
                ReferencedContainer = "container:pose.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -43,8 +43,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0A9EB0E42242D1F80047223E"
-            BuildableName = "pose.framework"
-            BlueprintName = "pose"
+            BuildableName = "Pose.framework"
+            BlueprintName = "Pose"
             ReferencedContainer = "container:pose.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -65,8 +65,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0A9EB0E42242D1F80047223E"
-            BuildableName = "pose.framework"
-            BlueprintName = "pose"
+            BuildableName = "Pose.framework"
+            BlueprintName = "Pose"
             ReferencedContainer = "container:pose.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -83,8 +83,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0A9EB0E42242D1F80047223E"
-            BuildableName = "pose.framework"
-            BlueprintName = "pose"
+            BuildableName = "Pose.framework"
+            BlueprintName = "Pose"
             ReferencedContainer = "container:pose.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

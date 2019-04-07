@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0A9EB0EF2242D1F80047223E /* pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* pose.framework */; };
+		0A9EB0EF2242D1F80047223E /* Pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* Pose.framework */; };
 		0A9EB0F42242D1F80047223E /* poseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB0F32242D1F80047223E /* poseTests.swift */; };
 		0A9EB0F62242D1F80047223E /* Pose.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A9EB0E82242D1F80047223E /* Pose.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0A9EB1002242D45D0047223E /* Pose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB0FF2242D45D0047223E /* Pose.swift */; };
@@ -21,13 +21,15 @@
 		0A9EB129224445E70047223E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB127224445E70047223E /* Main.storyboard */; };
 		0A9EB12B224445EB0047223E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB12A224445EB0047223E /* Assets.xcassets */; };
 		0A9EB12E224445EB0047223E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB12C224445EB0047223E /* LaunchScreen.storyboard */; };
-		0A9EB135224448490047223E /* pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* pose.framework */; };
-		0A9EB136224448490047223E /* pose.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* pose.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0A9EB135224448490047223E /* Pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* Pose.framework */; };
+		0A9EB136224448490047223E /* Pose.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* Pose.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A9EB13E2247C9C20047223E /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB13D2247C9C20047223E /* Media.xcassets */; };
 		0A9EB140224B4A5D0047223E /* PoseCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB13F224B4A5D0047223E /* PoseCommon.swift */; };
+		0A9EB141225A5C140047223E /* PoseModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB11B22443EB90047223E /* PoseModel.mlmodel */; };
 		A18470F0FC864696031F19FA /* Pods_pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A263B8CD7F71E206D6743DA /* Pods_pose.framework */; };
 		C25DF385FD390C9612125856 /* Pods_poseTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */; };
 		C4B6A548D54C72EFE454DE7C /* Pods_poseDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE60EB1E80CC2D8F3765F4EB /* Pods_poseDemo.framework */; };
+		D213806429FB3C930808476A /* Pods_Pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD02997F68EDEE3E8F41BC81 /* Pods_Pose.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,7 +63,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				0A9EB136224448490047223E /* pose.framework in Embed Frameworks */,
+				0A9EB136224448490047223E /* Pose.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -69,7 +71,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0A9EB0E52242D1F80047223E /* pose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = pose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A9EB0E52242D1F80047223E /* Pose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A9EB0E82242D1F80047223E /* Pose.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Pose.h; sourceTree = "<group>"; };
 		0A9EB0E92242D1F80047223E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0A9EB0EE2242D1F80047223E /* poseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = poseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,7 +82,7 @@
 		0A9EB10B2242DFE70047223E /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		0A9EB10C2242DFE70047223E /* UnsafeMutablePointer+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnsafeMutablePointer+Extension.swift"; sourceTree = "<group>"; };
 		0A9EB10D2242DFE70047223E /* Array+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
-		0A9EB11B22443EB90047223E /* PoseModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = PoseModel.mlmodel; path = CoreMLModels/PoseModel.mlmodel; sourceTree = SOURCE_ROOT; };
+		0A9EB11B22443EB90047223E /* PoseModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PoseModel.mlmodel; sourceTree = SOURCE_ROOT; };
 		0A9EB121224445E70047223E /* poseDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = poseDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A9EB123224445E70047223E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0A9EB125224445E70047223E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -93,11 +95,14 @@
 		1C0FB54EE83EE13DFA68B461 /* Pods-pose.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pose.release.xcconfig"; path = "Pods/Target Support Files/Pods-pose/Pods-pose.release.xcconfig"; sourceTree = "<group>"; };
 		25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_poseTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B50B1D0C803E6BA4E711B0F /* Pods-poseDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-poseDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-poseDemo/Pods-poseDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		5125EA67DB7715B834468F9C /* Pods-Pose.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pose.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Pose/Pods-Pose.debug.xcconfig"; sourceTree = "<group>"; };
 		5B70AC973DF55D2DFF74D523 /* Pods-poseTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-poseTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-poseTests/Pods-poseTests.debug.xcconfig"; sourceTree = "<group>"; };
 		8A263B8CD7F71E206D6743DA /* Pods_pose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_pose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DF83C2512B916EF7498B9B7 /* Pods-pose.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pose.debug.xcconfig"; path = "Pods/Target Support Files/Pods-pose/Pods-pose.debug.xcconfig"; sourceTree = "<group>"; };
 		C083EC74CE89908C93A65F96 /* Pods-poseTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-poseTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-poseTests/Pods-poseTests.release.xcconfig"; sourceTree = "<group>"; };
 		C7F25DA33650D457D247F853 /* Pods-poseDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-poseDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-poseDemo/Pods-poseDemo.release.xcconfig"; sourceTree = "<group>"; };
+		D9C4F7A3A251651131387A53 /* Pods-Pose.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pose.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pose/Pods-Pose.release.xcconfig"; sourceTree = "<group>"; };
+		DD02997F68EDEE3E8F41BC81 /* Pods_Pose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE60EB1E80CC2D8F3765F4EB /* Pods_poseDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_poseDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -107,6 +112,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A18470F0FC864696031F19FA /* Pods_pose.framework in Frameworks */,
+				D213806429FB3C930808476A /* Pods_Pose.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,7 +120,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A9EB0EF2242D1F80047223E /* pose.framework in Frameworks */,
+				0A9EB0EF2242D1F80047223E /* Pose.framework in Frameworks */,
 				C25DF385FD390C9612125856 /* Pods_poseTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,7 +129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A9EB135224448490047223E /* pose.framework in Frameworks */,
+				0A9EB135224448490047223E /* Pose.framework in Frameworks */,
 				C4B6A548D54C72EFE454DE7C /* Pods_poseDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -134,6 +140,7 @@
 		0A9EB0DB2242D1F70047223E = {
 			isa = PBXGroup;
 			children = (
+				0A9EB11B22443EB90047223E /* PoseModel.mlmodel */,
 				0A9EB1092242DFE70047223E /* Extensions */,
 				0A9EB0E82242D1F80047223E /* Pose.h */,
 				0A9EB13F224B4A5D0047223E /* PoseCommon.swift */,
@@ -150,7 +157,7 @@
 		0A9EB0E62242D1F80047223E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0A9EB0E52242D1F80047223E /* pose.framework */,
+				0A9EB0E52242D1F80047223E /* Pose.framework */,
 				0A9EB0EE2242D1F80047223E /* poseTests.xctest */,
 				0A9EB121224445E70047223E /* poseDemo.app */,
 			);
@@ -160,7 +167,6 @@
 		0A9EB0F22242D1F80047223E /* poseTests */ = {
 			isa = PBXGroup;
 			children = (
-				0A9EB11B22443EB90047223E /* PoseModel.mlmodel */,
 				0A9EB0F32242D1F80047223E /* poseTests.swift */,
 				0A9EB0F52242D1F80047223E /* Info.plist */,
 				0A9EB13D2247C9C20047223E /* Media.xcassets */,
@@ -198,6 +204,7 @@
 				8A263B8CD7F71E206D6743DA /* Pods_pose.framework */,
 				25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */,
 				DE60EB1E80CC2D8F3765F4EB /* Pods_poseDemo.framework */,
+				DD02997F68EDEE3E8F41BC81 /* Pods_Pose.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -211,6 +218,8 @@
 				C083EC74CE89908C93A65F96 /* Pods-poseTests.release.xcconfig */,
 				2B50B1D0C803E6BA4E711B0F /* Pods-poseDemo.debug.xcconfig */,
 				C7F25DA33650D457D247F853 /* Pods-poseDemo.release.xcconfig */,
+				5125EA67DB7715B834468F9C /* Pods-Pose.debug.xcconfig */,
+				D9C4F7A3A251651131387A53 /* Pods-Pose.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -229,9 +238,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		0A9EB0E42242D1F80047223E /* pose */ = {
+		0A9EB0E42242D1F80047223E /* Pose */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0A9EB0F92242D1F80047223E /* Build configuration list for PBXNativeTarget "pose" */;
+			buildConfigurationList = 0A9EB0F92242D1F80047223E /* Build configuration list for PBXNativeTarget "Pose" */;
 			buildPhases = (
 				D9132836C4BFAFCC6085D4F9 /* [CP] Check Pods Manifest.lock */,
 				0A9EB0E02242D1F80047223E /* Headers */,
@@ -243,9 +252,9 @@
 			);
 			dependencies = (
 			);
-			name = pose;
+			name = Pose;
 			productName = pose;
-			productReference = 0A9EB0E52242D1F80047223E /* pose.framework */;
+			productReference = 0A9EB0E52242D1F80047223E /* Pose.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		0A9EB0ED2242D1F80047223E /* poseTests */ = {
@@ -326,7 +335,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0A9EB0E42242D1F80047223E /* pose */,
+				0A9EB0E42242D1F80047223E /* Pose */,
 				0A9EB0ED2242D1F80047223E /* poseTests */,
 				0A9EB120224445E70047223E /* poseDemo */,
 			);
@@ -449,7 +458,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-pose-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Pose-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -487,6 +496,7 @@
 			files = (
 				0A9EB126224445E70047223E /* ViewController.swift in Sources */,
 				0A9EB124224445E70047223E /* AppDelegate.swift in Sources */,
+				0A9EB141225A5C140047223E /* PoseModel.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,7 +505,7 @@
 /* Begin PBXTargetDependency section */
 		0A9EB0F12242D1F80047223E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 0A9EB0E42242D1F80047223E /* pose */;
+			target = 0A9EB0E42242D1F80047223E /* Pose */;
 			targetProxy = 0A9EB0F02242D1F80047223E /* PBXContainerItemProxy */;
 		};
 		0A9EB134224445F20047223E /* PBXTargetDependency */ = {
@@ -505,7 +515,7 @@
 		};
 		0A9EB138224448490047223E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 0A9EB0E42242D1F80047223E /* pose */;
+			target = 0A9EB0E42242D1F80047223E /* Pose */;
 			targetProxy = 0A9EB137224448490047223E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -654,7 +664,7 @@
 		};
 		0A9EB0FA2242D1F80047223E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8DF83C2512B916EF7498B9B7 /* Pods-pose.debug.xcconfig */;
+			baseConfigurationReference = 5125EA67DB7715B834468F9C /* Pods-Pose.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -683,7 +693,7 @@
 		};
 		0A9EB0FB2242D1F80047223E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1C0FB54EE83EE13DFA68B461 /* Pods-pose.release.xcconfig */;
+			baseConfigurationReference = D9C4F7A3A251651131387A53 /* Pods-Pose.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -803,7 +813,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0A9EB0F92242D1F80047223E /* Build configuration list for PBXNativeTarget "pose" */ = {
+		0A9EB0F92242D1F80047223E /* Build configuration list for PBXNativeTarget "Pose" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0A9EB0FA2242D1F80047223E /* Debug */,

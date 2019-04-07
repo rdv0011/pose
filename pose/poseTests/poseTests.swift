@@ -24,13 +24,13 @@ class PoseTests: XCTestCase {
     }
 
     func testExample() {
-        guard let testImage = UIImage(named: "five_people", in: Bundle(for: PoseTests.self), compatibleWith: nil) else {
+        guard let testImage = UIImage(named: "sample_pose", in: Bundle(for: PoseTests.self), compatibleWith: nil) else {
             assertionFailure("Failed to open image")
             return
         }
         
-        let pose = PoseEstimation(model: PoseModel().model)
-        let estimationCompleted = XCTestExpectation(description: "Pose estimation completed")
+        let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
+        let estimationCompleted = XCTestExpectation(description: "Pose estimation has completed")
         pose.estimate(on: testImage) { humans in
             print(humans)
             estimationCompleted.fulfill()
