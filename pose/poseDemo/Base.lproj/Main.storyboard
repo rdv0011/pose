@@ -22,23 +22,46 @@
                                 <rect key="frame" x="0.0" y="20" width="375" height="647"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Ua8-Ll-eBO">
-                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="itemSize" width="375" height="193"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
-                                <activityIndicatorView key="backgroundView" hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" id="A8m-bc-LVC">
+                                <activityIndicatorView key="backgroundView" hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" id="A8m-bc-LVC">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 </activityIndicatorView>
                                 <cells>
-                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="t1k-W7-BkC">
-                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ImageCollectionViewCell" id="t1k-W7-BkC" customClass="ImageCollectionViewCell" customModule="poseDemo" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="193"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
-                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="193"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="weO-W7-p2F">
+                                                    <rect key="frame" x="8" y="28" width="359" height="157"/>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Description" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jdO-dU-PVD">
+                                                    <rect key="frame" x="267" y="40" width="88" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
                                         </view>
+                                        <constraints>
+                                            <constraint firstItem="jdO-dU-PVD" firstAttribute="top" secondItem="t1k-W7-BkC" secondAttribute="topMargin" constant="12" id="2tq-L7-3iZ"/>
+                                            <constraint firstAttribute="bottomMargin" secondItem="weO-W7-p2F" secondAttribute="bottom" id="4My-cB-VWX"/>
+                                            <constraint firstAttribute="trailingMargin" secondItem="jdO-dU-PVD" secondAttribute="trailing" constant="12" id="GND-u6-gxX"/>
+                                            <constraint firstItem="weO-W7-p2F" firstAttribute="top" secondItem="t1k-W7-BkC" secondAttribute="topMargin" id="Pns-aF-6ak"/>
+                                            <constraint firstAttribute="trailingMargin" secondItem="weO-W7-p2F" secondAttribute="trailing" id="Ywm-74-dPX"/>
+                                            <constraint firstItem="weO-W7-p2F" firstAttribute="leading" secondItem="t1k-W7-BkC" secondAttribute="leadingMargin" id="ns2-Ru-8E3"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="descriptionLabel" destination="jdO-dU-PVD" id="Jfj-kz-w1M"/>
+                                            <outlet property="imageView" destination="weO-W7-p2F" id="Vz4-Cg-pu4"/>
+                                        </connections>
                                     </collectionViewCell>
                                 </cells>
                                 <connections>
@@ -58,12 +81,13 @@
                     </view>
                     <connections>
                         <outlet property="activityIndicator" destination="A8m-bc-LVC" id="7ae-dS-oJd"/>
-                        <outlet property="viewCollection" destination="t1k-W7-BkC" id="2Aq-3g-gWN"/>
+                        <outlet property="viewCollection" destination="UNZ-qa-48N" id="Jvg-LA-NqL"/>
                         <outlet property="viewCollectionFlow" destination="Ua8-Ll-eBO" id="TJM-hM-tBK"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="136.80000000000001" y="92.203898050974516"/>
         </scene>
     </scenes>
 </document>

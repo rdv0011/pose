@@ -164,6 +164,9 @@ public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
             return JointConnection.array.firstIndex(of: self)!
         }
     }
+    
+    public init() {
+    }
 }
 
 struct HeatMapJointCandidate {

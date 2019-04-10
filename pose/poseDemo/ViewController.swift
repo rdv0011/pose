@@ -8,10 +8,10 @@
 
 import UIKit
 import CoreML
-import pose
+import Pose
 
 class ViewController: UIViewController {
-    @IBOutlet weak var viewCollection: UICollectionViewCell!
+    @IBOutlet weak var viewCollection: UICollectionView!
     @IBOutlet weak var viewCollectionFlow: UICollectionViewFlowLayout!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
@@ -27,8 +27,8 @@ class ViewController: UIViewController {
         
         activityIndicator.startAnimating()
         pose.estimate(on: testImage) { humans in
-            activityIndicator.stopAnimating()
-            viewCollection.reloadInputViews()
+            self.activityIndicator.stopAnimating()
+            self.viewCollection.reloadData()
         }
     }
 
@@ -45,7 +45,11 @@ extension ViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return UICollectionViewCell()
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "\(ImageCollectionViewCell.self)", for: indexPath) as? ImageCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.imageView.image = pose.heatmapMatricesCombined
+        return cell
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {

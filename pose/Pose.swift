@@ -322,21 +322,24 @@ extension PoseEstimation {
     }
     
     public var heatmapMatricesCombined: UIImage {
-        let heatMatCount = self.modelConfig.backgroundLayerIndex
+        guard networkOutput.count > modelConfig.backgroundLayerIndex * modelOutputLayerStride else {
+            return UIImage()
+        }
+        let heatMatCount = modelConfig.backgroundLayerIndex
         return networkOutput.drawMatricesCombined(matricesCount: heatMatCount,
-                                                  width: self.modelConfig.outputWidh,
-                                                  height: self.modelConfig.outputHeight,
+                                                  width: modelConfig.outputWidh,
+                                                  height: modelConfig.outputHeight,
                                                   colors: Pose.colors)
     }
     
     public var heatMapCandidatesImage: UIImage {
-        let modelOutputWidth = self.modelConfig.outputWidh
-        let modelOutputHeight = self.modelConfig.outputHeight
-        let backgroundLayer = Array(networkOutput[self.modelConfig.backgroundLayerIndex..<modelOutputLayerStride])
+        let modelOutputWidth = modelConfig.outputWidh
+        let modelOutputHeight = modelConfig.outputHeight
+        let backgroundLayer = Array(networkOutput[modelConfig.backgroundLayerIndex..<modelOutputLayerStride])
         // Draw heatmap candidates for joints after NN output filtering
-        // Use alpha to show candiates that are overlapping
+        // Use alpha to indicate candiates confidence
         let resizedBackgroundLayer = backgroundLayer.draw(width: modelOutputWidth,
-                                                          height: modelOutputHeight).resized(to: self.modelConfig.inputSize)
+                                                          height: modelOutputHeight).resized(to: modelConfig.inputSize)
         return heatMapCandidates.draw(width: modelOutputWidth,
                                       height: modelOutputHeight,
                                       radius: 3.0,

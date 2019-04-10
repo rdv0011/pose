@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A1ADA30225BB1C40057CD16 /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1ADA2F225BB1C40057CD16 /* ImageCollectionViewCell.swift */; };
 		0A9EB0EF2242D1F80047223E /* Pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* Pose.framework */; };
 		0A9EB0F42242D1F80047223E /* poseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB0F32242D1F80047223E /* poseTests.swift */; };
 		0A9EB0F62242D1F80047223E /* Pose.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A9EB0E82242D1F80047223E /* Pose.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -71,6 +72,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A1ADA2F225BB1C40057CD16 /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		0A9EB0E52242D1F80047223E /* Pose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A9EB0E82242D1F80047223E /* Pose.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Pose.h; sourceTree = "<group>"; };
 		0A9EB0E92242D1F80047223E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -194,6 +196,7 @@
 				0A9EB12A224445EB0047223E /* Assets.xcassets */,
 				0A9EB12C224445EB0047223E /* LaunchScreen.storyboard */,
 				0A9EB12F224445EB0047223E /* Info.plist */,
+				0A1ADA2F225BB1C40057CD16 /* ImageCollectionViewCell.swift */,
 			);
 			path = poseDemo;
 			sourceTree = "<group>";
@@ -496,6 +499,7 @@
 			files = (
 				0A9EB126224445E70047223E /* ViewController.swift in Sources */,
 				0A9EB124224445E70047223E /* AppDelegate.swift in Sources */,
+				0A1ADA30225BB1C40057CD16 /* ImageCollectionViewCell.swift in Sources */,
 				0A9EB141225A5C140047223E /* PoseModel.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
