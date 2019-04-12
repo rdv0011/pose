@@ -9,7 +9,8 @@ import UIKit
 
 extension UnsafeMutablePointer where Pointee == Float32 {
     
-    func array(idx: Int, stride: Int) -> Array<Pointee> {
-        return Array(UnsafeBufferPointer(start: advanced(by: idx * stride), count: stride))
+    /// Returns an array with a specified index and size
+    func array(index: Int, count: Int) -> Array<Pointee> {
+        return Array(UnsafeBufferPointer(start: advanced(by: index * count), count: count))
     }
 }

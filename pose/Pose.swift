@@ -180,12 +180,11 @@ extension PoseEstimation {
                     
                     if self.keepDebugInfo {
                         // Convert a network output to an array for debugging purposes
-                        self.networkOutput = Array(UnsafeBufferPointer(start: nnOutput.advanced(by: 0), count: layersCount * layerStride))
+                        self.networkOutput = nnOutput.array(index: 0, count: layersCount * layerStride)
                     }
-                    
-                    // Filter the network output by applying a threshold
-                    let arr = Array(UnsafeBufferPointer(start: heatMatPtr, count: heatMatCount * layerStride))
-                    let avg = arr.reduce(0, +) / Float32(arr.count)
+                    // Filter the heatmapp network output by applying a threshold
+                    let heatMapArray = heatMatPtr.array(index: 0, count: heatMatCount * layerStride)
+                    let avg = heatMapArray.reduce(0, +) / Float32(heatMapArray.count)
                     let NMS_Threshold: Float32 = 0.1
                     var _NMS_Threshold = max(avg * 4.0, NMS_Threshold)
                     _NMS_Threshold = min(_NMS_Threshold, 0.3)
@@ -228,10 +227,10 @@ extension PoseEstimation {
                     pose.jointConnections.forEach { connection in
                         
                         let (indexX, indexY) = connection.pafIndices
-                        let pafMatX = nnOutput.array(idx: pafLayerStartIndex + indexX,
-                                                     stride: layerStride)
-                        let pafMatY = nnOutput.array(idx: pafLayerStartIndex + indexY,
-                                                     stride: layerStride)
+                        let pafMatX = nnOutput.array(index: pafLayerStartIndex + indexX,
+                                                     count: layerStride)
+                        let pafMatY = nnOutput.array(index: pafLayerStartIndex + indexY,
+                                                     count: layerStride)
                         
                         let (joint1, joint2) = (connection.joints.0, connection.joints.1)
                         
@@ -322,9 +321,6 @@ extension PoseEstimation {
     }
     
     public var heatmapMatricesCombined: UIImage {
-        guard networkOutput.count > modelConfig.backgroundLayerIndex * modelOutputLayerStride else {
-            return UIImage()
-        }
         let heatMatCount = modelConfig.backgroundLayerIndex
         return networkOutput.drawMatricesCombined(matricesCount: heatMatCount,
                                                   width: modelConfig.outputWidh,
@@ -335,7 +331,8 @@ extension PoseEstimation {
     public var heatMapCandidatesImage: UIImage {
         let modelOutputWidth = modelConfig.outputWidh
         let modelOutputHeight = modelConfig.outputHeight
-        let backgroundLayer = Array(networkOutput[modelConfig.backgroundLayerIndex..<modelOutputLayerStride])
+        let backgroundLayer = networkOutput.slice(blockIndex: modelConfig.backgroundLayerIndex,
+                                                  blockSize: modelOutputLayerStride)
         // Draw heatmap candidates for joints after NN output filtering
         // Use alpha to indicate candiates confidence
         let resizedBackgroundLayer = backgroundLayer.draw(width: modelOutputWidth,
@@ -380,8 +377,10 @@ extension PoseEstimation {
             let pose = PoseModelConfigurationMPI15()
             pose.jointConnections.forEach { connection in
                 let (indexX, indexY) = connection.pafIndices
-                let pafMatX = Array(self.networkOutput[pafLayerStartIndex + indexX..<self.modelOutputLayerStride])
-                let pafMatY = Array(self.networkOutput[pafLayerStartIndex + indexY..<self.modelOutputLayerStride])
+                let pafMatX = self.networkOutput.slice(blockIndex: pafLayerStartIndex + indexX,
+                                                       blockSize: self.modelOutputLayerStride)
+                let pafMatY = self.networkOutput.slice(blockIndex: pafLayerStartIndex + indexY,
+                                                       blockSize: self.modelOutputLayerStride)
                 let pafXImage = pafMatX.draw(width: modelOutputWidth, height: modelOutputHeight)
                 let pafYImage = pafMatY.draw(width: modelOutputWidth, height: modelOutputHeight)
                 
@@ -396,8 +395,10 @@ extension PoseEstimation {
                 let (heatMapIndex1, heatMapIndex2) = (connection.joints.0.index(), connection.joints.1.index())
                 // Heatmap's starts from the zero index therefore no offset is needed for a 'heatMapIndex'
                 // 'heatMap1' corresponds to the first joint, 'heatMap2' to the second one
-                let heatMap1 = Array(self.networkOutput[heatMapIndex1..<self.modelOutputLayerStride])
-                let heatMap2 = Array(self.networkOutput[heatMapIndex2..<self.modelOutputLayerStride])
+                let heatMap1 = self.networkOutput.slice(blockIndex: heatMapIndex1,
+                                                        blockSize: self.modelOutputLayerStride)
+                let heatMap2 = self.networkOutput.slice(blockIndex: heatMapIndex2,
+                                                        blockSize: self.modelOutputLayerStride)
                 var heatMap1Image = heatMap1.draw(width: modelOutputWidth, height: modelOutputHeight)
                 var heatMap2Image = heatMap2.draw(width: modelOutputWidth, height: modelOutputHeight)
                 
@@ -471,7 +472,8 @@ extension PoseEstimation {
         // Filter each heatmap layer by subtracting a min value
         let pafCount = layersCount - pafLayerStartIndex + 1
         for layerIndex in 0..<pafCount {
-            var channelArray = Array(self.networkOutput[pafLayerStartIndex + layerIndex..<modelOutputLayerStride])
+            var channelArray = self.networkOutput.slice(blockIndex: pafLayerStartIndex + layerIndex,
+                                                        blockSize: modelOutputLayerStride)
             let keyFactor = Float(10000) // is used to make a key(integral value) out of float value
             let valSet = NSCountedSet(array: channelArray.map { ($0 * keyFactor).rounded() })
             let hist = valSet.sorted(by: { (a, b) -> Bool in
@@ -486,7 +488,8 @@ extension PoseEstimation {
                 }
             }
         }
-        let pafArray = Array(self.networkOutput[pafLayerStartIndex..<pafCount * modelOutputLayerStride])
+        let pafArray = self.networkOutput.slice(blockIndex: pafLayerStartIndex,
+                                                blockSize: pafCount * modelOutputLayerStride)
         return pafArray.drawMatricesCombined(matricesCount: pafCount,
                                           width: modelOutputWidth,
                                           height: modelOutputHeight,
