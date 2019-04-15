@@ -24,16 +24,16 @@ extension Array where Element == Float {
     }
     
     func drawMatricesCombined(matricesCount: Int, width: Int, height: Int, colors: [UIColor]) -> UIImage {
-        let matStride = width * height
-        guard self.count > matricesCount * matStride else {
+        let matSize = width * height
+        let size = matricesCount * matSize
+        guard self.count >= size else {
             return UIImage()
         }
         var finalImage = UIImage()
         
-        for idx in stride(from: 0, to: matricesCount, by: matStride) {
-            let endIndex = Swift.min(idx + matStride, self.count - 1)
-            let elementsCount = endIndex - idx + 1
-            let matArray = Array(self[idx..<elementsCount])
+        for idx in stride(from: 0, to: size, by: matSize) {
+            let endIndex = Swift.min(idx + matSize, self.count - 1)
+            let matArray = Array(self[idx..<endIndex])
             let color = colors[idx % colors.count]
             let image = matArray.draw(width: width, height: height).tinted(with: color)
             if idx == 0 {
@@ -49,8 +49,9 @@ extension Array where Element == Float {
     /// blockIndex - an index of the block
     /// blockSize - equals to block size
     func slice(blockIndex: Int, blockSize: Int) -> Array {
-        let firstElementIdx = blockIndex * blockSize
-        return Array(self[firstElementIdx..<blockSize])
+        let idx = blockIndex * blockSize
+        let endIdx = idx + blockSize
+        return Array(self[idx..<endIdx])
     }
 }
 

@@ -95,9 +95,8 @@ extension UIImage {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         
         let fileURL = documentsDirectory.appendingPathComponent(tofileName).deletingPathExtension()
-            .appendingPathExtension("jpg")
-        if let data = self.jpegData(compressionQuality:  1.0),
-            !FileManager.default.fileExists(atPath: fileURL.path) {
+            .appendingPathExtension("png")
+        if let data = self.pngData() {
             do {
                 try data.write(to: fileURL)
             } catch {

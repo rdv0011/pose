@@ -69,13 +69,21 @@ public protocol PoseModelConfiguration {
 }
 
 public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
-    public let layersCount = 44
-    public let backgroundLayerIndex = 15
-    public let pafLayerStartIndex = 16
-    public let outputWidh = 64
-    public let outputHeight = 64
-    public let inputSize = CGSize(width: 512, height: 512)
-    public let scoreThreasholdFactor = Float32(2)
+
+    public var layersCount: Int = 44
+    
+    public var backgroundLayerIndex: Int = 15
+    
+    public var pafLayerStartIndex: Int = 16
+    
+    public var outputWidh: Int = 64
+    
+    public var outputHeight: Int = 64
+    
+    public var inputSize: CGSize = CGSize(width: 512, height: 512)
+    
+    public var scoreThreasholdFactor: Float = 2
+    
     
     var joints = BodyJoint.array
     var jointConnections = JointConnection.array

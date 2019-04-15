@@ -226,6 +226,10 @@ extension PoseEstimation {
                     var connections: [JointConnectionWithScore] = []
                     pose.jointConnections.forEach { connection in
                         
+                        if connection == .lHipLKnee {
+                            self.log.debug("print")
+                        }
+                        
                         let (indexX, indexY) = connection.pafIndices
                         let pafMatX = nnOutput.array(index: pafLayerStartIndex + indexX,
                                                      count: layerStride)
@@ -261,7 +265,6 @@ extension PoseEstimation {
                                                                                       joint2: jointPoint2)
                                         self.connectionCandidates.append(connWithCoords)
                                     }
-                                    self.log.debug("\(connection) \(s) \(c) \(x1) \(y1) \(x2) \(y2)")
                                 }
                             }
                             allConnectionCandidates += self.connectionCandidates
@@ -320,54 +323,73 @@ extension PoseEstimation {
         return formatter.string(from: NSNumber(value: timeElapsed)) ?? ""
     }
     
-    public var heatmapMatricesCombined: UIImage {
+    public func heatMapLayersCombined(completion: @escaping ((UIImage)->())) {
         let heatMatCount = modelConfig.backgroundLayerIndex
-        return networkOutput.drawMatricesCombined(matricesCount: heatMatCount,
-                                                  width: modelConfig.outputWidh,
-                                                  height: modelConfig.outputHeight,
-                                                  colors: Pose.colors)
+        DispatchQueue.global(qos: .userInteractive).async {
+            completion(self.networkOutput.drawMatricesCombined(matricesCount: heatMatCount,
+                                                      width: self.modelConfig.outputWidh,
+                                                      height: self.modelConfig.outputHeight,
+                                                      colors: Pose.colors))
+        }
     }
     
-    public var heatMapCandidatesImage: UIImage {
+    public func heatMapCandidatesImage(completion: @escaping ((UIImage)->())) {
+        guard networkOutput.count >= modelConfig.layersCount * self.modelOutputLayerStride else {
+            log.error("The netowrk output array has an incorrect size or it was not set")
+            completion(UIImage())
+            return
+        }
+        
         let modelOutputWidth = modelConfig.outputWidh
         let modelOutputHeight = modelConfig.outputHeight
         let backgroundLayer = networkOutput.slice(blockIndex: modelConfig.backgroundLayerIndex,
                                                   blockSize: modelOutputLayerStride)
-        // Draw heatmap candidates for joints after NN output filtering
-        // Use alpha to indicate candiates confidence
-        let resizedBackgroundLayer = backgroundLayer.draw(width: modelOutputWidth,
-                                                          height: modelOutputHeight).resized(to: modelConfig.inputSize)
-        return heatMapCandidates.draw(width: modelOutputWidth,
-                                      height: modelOutputHeight,
-                                      radius: 3.0,
-                                      lineWidth: 2.0,
-                                      on: resizedBackgroundLayer)
+        DispatchQueue.global(qos: .userInteractive).async {
+            // Draw heatmap candidates for joints after NN output filtering
+            // Use alpha to indicate candiates confidence
+            let resizedBackgroundLayer = backgroundLayer.draw(width: modelOutputWidth,
+                                                              height: modelOutputHeight).resized(to: self.modelConfig.inputSize)
+            completion(self.heatMapCandidates.draw(width: modelOutputWidth,
+                                          height: modelOutputHeight,
+                                          radius: 3.0,
+                                          lineWidth: 2.0,
+                                          on: resizedBackgroundLayer))
+        }
     }
     
-    public var filteredHeatMapCandidatesImage: UIImage {
-        // Draw joint candidates after second round filtering
-        return filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidh,
-                                              height: self.modelConfig.outputHeight,
-                                              radius: 3.0,
-                                              lineWidth: 6.0,
-                                              on: UIImage.image(with: .white, size: self.modelConfig.inputSize))
+    public func filteredHeatMapCandidatesImage(completion: @escaping ((UIImage)->())) {
+        DispatchQueue.global(qos: .userInteractive).async {
+            // Draw joint candidates after second round filtering
+            completion(self.filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidh,
+                                                  height: self.modelConfig.outputHeight,
+                                                  radius: 3.0,
+                                                  lineWidth: 6.0,
+                                                  on: UIImage.image(with: .white, size: self.modelConfig.inputSize)))
+        }
     }
     
-    public var jointsWithConnections: UIImage {
-        // Draw all connecions using a score as an alpha
-        let allConnectionsImage = connectionCandidates.draw(width: self.modelConfig.outputWidh,
-                                                               height: self.modelConfig.outputHeight,
-                                                               lineWidth: 5,
-                                                               on: UIImage.image(with: .white, size: self.modelConfig.inputSize))
-        // Draw filtered joints over the all connection candidates
-        return filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidh,
-                                    height: self.modelConfig.outputHeight,
-                                    radius: 5,
-                                    lineWidth: 3,
-                                    on: allConnectionsImage)
+    public func jointsWithConnectionsImage(completion: @escaping ((UIImage)->())) {
+        DispatchQueue.global(qos: .userInteractive).async {
+            // Draw all connecions using a score as an alpha
+            let allConnectionsImage = self.connectionCandidates.draw(width: self.modelConfig.outputWidh,
+                                                                   height: self.modelConfig.outputHeight,
+                                                                   lineWidth: 5,
+                                                                   on: UIImage.image(with: .white, size: self.modelConfig.inputSize))
+            // Draw filtered joints over the all connection candidates
+            completion(self.filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidh,
+                                        height: self.modelConfig.outputHeight,
+                                        radius: 5,
+                                        lineWidth: 3,
+                                        on: allConnectionsImage))
+        }
     }
     
     public func jointsWithConnectionsByLayers(completion: @escaping (([UIImage])->())) {
+        guard networkOutput.count >= modelConfig.layersCount * self.modelOutputLayerStride else {
+            log.error("The netowrk output array has an incorrect size or it was not set")
+            completion([UIImage()])
+            return
+        }
         DispatchQueue.global(qos: .userInteractive).async {
             let modelOutputWidth = self.modelConfig.outputWidh
             let modelOutputHeight = self.modelConfig.outputHeight
@@ -449,50 +471,64 @@ extension PoseEstimation {
         }
     }
     
-    public func humanConnections(overImage: UIImage) -> UIImage {
-        // Draw human joints and connections over an input image
-        var resultImage = overImage.grayed
-        self.humanConnections.forEach { h in
-            resultImage = h.value.draw(width: self.modelConfig.outputWidh,
-                                       height: self.modelConfig.outputHeight,
-                                       lineWidth: 3,
-                                       drawJoint: true,
-                                       alpha: 1.0,
-                                       on: resultImage)
+    public func humanPosesImage(overImage: UIImage, completion: @escaping ((UIImage)->())) {
+        guard self.humanConnections.count > 0 else {
+            log.error("No human pose was detected")
+            completion(UIImage())
+            return
         }
-        return resultImage
+        // Draw human joints and connections over an input image
+        DispatchQueue.global(qos: .userInteractive).async {
+            var resultImage = overImage.grayed
+            self.humanConnections.forEach { h in
+                resultImage = h.value.draw(width: self.modelConfig.outputWidh,
+                                           height: self.modelConfig.outputHeight,
+                                           lineWidth: 3,
+                                           drawJoint: true,
+                                           alpha: 1.0,
+                                           on: resultImage)
+            }
+            completion(resultImage)
+        }
     }
     
-    public var pafLayers: UIImage {
+    public func pafLayersCombinedImage(completion: @escaping ((UIImage)->())) {
+        guard networkOutput.count >= modelConfig.layersCount * self.modelOutputLayerStride else {
+            log.error("The netowrk output array has an incorrect size or it was not set")
+            completion(UIImage())
+            return
+        }
         let layersCount = self.modelConfig.layersCount
         let modelOutputWidth = self.modelConfig.outputWidh
         let modelOutputHeight = self.modelConfig.outputHeight
         let pafLayerStartIndex = self.modelConfig.pafLayerStartIndex
+        let modelOutputLayerStride = self.modelOutputLayerStride
         
         // Filter each heatmap layer by subtracting a min value
-        let pafCount = layersCount - pafLayerStartIndex + 1
-        for layerIndex in 0..<pafCount {
-            var channelArray = self.networkOutput.slice(blockIndex: pafLayerStartIndex + layerIndex,
-                                                        blockSize: modelOutputLayerStride)
-            let keyFactor = Float(10000) // is used to make a key(integral value) out of float value
-            let valSet = NSCountedSet(array: channelArray.map { ($0 * keyFactor).rounded() })
-            let hist = valSet.sorted(by: { (a, b) -> Bool in
-                return valSet.count(for: a) < valSet.count(for: b)
-            })
-            if let last = hist.last as? Int {
-                let maxHist = Float(last) / keyFactor
-                for idx in 0..<modelOutputLayerStride {
-                    if channelArray[idx] < 0 {
-                        channelArray[idx] = abs(channelArray[idx] - maxHist)
+        let pafCount = layersCount - pafLayerStartIndex
+        DispatchQueue.global(qos: .userInteractive).async {
+            
+            for layerIndex in 0..<pafCount {
+                var channelArray = self.networkOutput.slice(blockIndex: pafLayerStartIndex + layerIndex,
+                                                            blockSize: modelOutputLayerStride)
+                let keyFactor = Float(10000) // is used to make a key(integral value) out of float value
+                let valSet = NSCountedSet(array: channelArray.map { ($0 * keyFactor).rounded() })
+                let hist = valSet.sorted(by: { (a, b) -> Bool in
+                    return valSet.count(for: a) < valSet.count(for: b)
+                })
+                if let last = hist.last as? Int {
+                    let maxHist = Float(last) / keyFactor
+                    for idx in 0..<modelOutputLayerStride {
+                        if channelArray[idx] < 0 {
+                            channelArray[idx] = abs(channelArray[idx] - maxHist)
+                        }
                     }
                 }
             }
+            let pafArray = Array(self.networkOutput[(pafLayerStartIndex * modelOutputLayerStride)...])
+            let image = pafArray.drawMatricesCombined(matricesCount: pafCount, width: modelOutputWidth,
+                                                     height: modelOutputHeight, colors: Pose.colors)
+            completion(image)
         }
-        let pafArray = self.networkOutput.slice(blockIndex: pafLayerStartIndex,
-                                                blockSize: pafCount * modelOutputLayerStride)
-        return pafArray.drawMatricesCombined(matricesCount: pafCount,
-                                          width: modelOutputWidth,
-                                          height: modelOutputHeight,
-                                          colors: Pose.colors)
     }
 }
