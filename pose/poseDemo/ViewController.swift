@@ -17,15 +17,17 @@ class ViewController: UIViewController {
     
     private let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
     private lazy var testImage: UIImage  = {
-        guard let testImage = UIImage(named: "sample-pose2-resized", in: Bundle(for: ViewController.self), compatibleWith: nil) else {
+        guard let testImage = UIImage(named: "sample-pose1-resized", in: Bundle(for: ViewController.self), compatibleWith: nil) else {
             assertionFailure("Failed to open image")
             return UIImage()
         }
         return testImage
     }()
     private var imageCount = 0
-    private var imageCach: [UIImage?] = Array(repeating: nil, count: 5)
-    
+    private static let totalImagesCount = 4 + 84
+    private var imageCach: [UIImage?] = Array(repeating: nil, count: ViewController.totalImagesCount)
+    private var jointsWithConnectionsByLayersProcesing = false
+
     override func viewDidLoad() {
         super.viewDidLoad()
         pose.keepDebugInfo = true
@@ -37,7 +39,7 @@ class ViewController: UIViewController {
         activityIndicator.startAnimating()
         pose.estimate(on: testImage) { humans in
             DispatchQueue.main.async {
-                self.imageCount = 5
+                self.imageCount = ViewController.totalImagesCount
                 self.activityIndicator.stopAnimating()
                 self.viewCollection.reloadData()
             }
@@ -97,11 +99,18 @@ extension ViewController {
             pose.heatMapCandidatesImage(completion: completionBlock)
         case 3:
             pose.filteredHeatMapCandidatesImage(completion: completionBlock)
-        case 4:
-            pose.jointsWithConnectionsByLayers { images in
-                DispatchQueue.main.async {
-                    self.imageCach[row] = images.first
-                    completion(images.first ?? UIImage())
+        case 4..<83:
+            if !jointsWithConnectionsByLayersProcesing {
+                jointsWithConnectionsByLayersProcesing = true
+                pose.jointsWithConnectionsByLayers { images in
+                    DispatchQueue.main.async {
+                        self.jointsWithConnectionsByLayersProcesing = false
+                        images.enumerated().forEach { idx, element in
+                            self.imageCach[4 + idx] = element
+                        }
+                        self.viewCollection.reloadData()
+                        completion(images.first ?? UIImage())
+                    }
                 }
             }
         default:

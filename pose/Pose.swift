@@ -116,7 +116,7 @@ open class PoseEstimation {
         
         var uiImage = image
         if image.size != modelConfig.inputSize {
-            uiImage = image.resizedCenteredKeepingSpectRatio(toSize: modelConfig.inputSize)
+            uiImage = image.resizedCentered(toSize: modelConfig.inputSize)
         }
         
         guard let ciImage = CIImage(image: uiImage) else {
@@ -225,11 +225,7 @@ extension PoseEstimation {
                     var allConnectionCandidates: [JointConnectionWithScore] = []
                     var connections: [JointConnectionWithScore] = []
                     pose.jointConnections.forEach { connection in
-                        
-                        if connection == .lHipLKnee {
-                            self.log.debug("print")
-                        }
-                        
+
                         let (indexX, indexY) = connection.pafIndices
                         let pafMatX = nnOutput.array(index: pafLayerStartIndex + indexX,
                                                      count: layerStride)

@@ -73,20 +73,22 @@ extension UIImage {
         return image
     }
     
-    func resizedCenteredKeepingSpectRatio(toSize: CGSize) -> UIImage {
+    func resizedCentered(toSize: CGSize) -> UIImage {
         let oldWidth = self.size.width
         let oldHeight = self.size.height
         let scaleFactor = self.size.height > self.size.width ?
             toSize.height / oldHeight : toSize.width / oldWidth
         let newSize = CGSize(width: oldWidth * scaleFactor, height: size.height * scaleFactor)
-        
+        let newRect = CGRect(origin: CGPoint(x: 0.5 * (toSize.width - newSize.width),
+                                             y: 0.5 * (toSize.height - newSize.height)),
+                             size: newSize)
         let format = UIGraphicsImageRendererFormat.default()
         format.scale = scale
         let renderer = UIGraphicsImageRenderer(size: toSize, format: format)
-        let image = renderer.image { _ in
-            draw(in: CGRect(origin: CGPoint(x: 0.5 * (toSize.width - newSize.width),
-                                            y: 0.5 * (toSize.height - newSize.height)),
-                            size: newSize))
+        let image = renderer.image { ctx in
+            UIColor.white.setFill()
+            ctx.fill(CGRect(x: 0, y: 0, width: toSize.width, height: toSize.height))
+            draw(in: newRect)
         }
         return image
     }
