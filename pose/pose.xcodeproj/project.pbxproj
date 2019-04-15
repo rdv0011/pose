@@ -16,7 +16,6 @@
 		0A9EB10F2242DFE70047223E /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB10B2242DFE70047223E /* UIImage+Extension.swift */; };
 		0A9EB1102242DFE70047223E /* UnsafeMutablePointer+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB10C2242DFE70047223E /* UnsafeMutablePointer+Extension.swift */; };
 		0A9EB1112242DFE70047223E /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB10D2242DFE70047223E /* Array+Extension.swift */; };
-		0A9EB11C22443EB90047223E /* PoseModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB11B22443EB90047223E /* PoseModel.mlmodel */; };
 		0A9EB124224445E70047223E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB123224445E70047223E /* AppDelegate.swift */; };
 		0A9EB126224445E70047223E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB125224445E70047223E /* ViewController.swift */; };
 		0A9EB129224445E70047223E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB127224445E70047223E /* Main.storyboard */; };
@@ -26,11 +25,12 @@
 		0A9EB136224448490047223E /* Pose.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* Pose.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A9EB13E2247C9C20047223E /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A9EB13D2247C9C20047223E /* Media.xcassets */; };
 		0A9EB140224B4A5D0047223E /* PoseCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB13F224B4A5D0047223E /* PoseCommon.swift */; };
-		0A9EB141225A5C140047223E /* PoseModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB11B22443EB90047223E /* PoseModel.mlmodel */; };
 		A18470F0FC864696031F19FA /* Pods_pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A263B8CD7F71E206D6743DA /* Pods_pose.framework */; };
 		C25DF385FD390C9612125856 /* Pods_poseTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */; };
 		C4B6A548D54C72EFE454DE7C /* Pods_poseDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE60EB1E80CC2D8F3765F4EB /* Pods_poseDemo.framework */; };
 		D213806429FB3C930808476A /* Pods_Pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD02997F68EDEE3E8F41BC81 /* Pods_Pose.framework */; };
+		F1E18243226489A0008231ED /* PoseModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F1E182412264827D008231ED /* PoseModel.mlmodel */; };
+		F1E18244226489A2008231ED /* PoseModel.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = F1E182412264827D008231ED /* PoseModel.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,7 +84,6 @@
 		0A9EB10B2242DFE70047223E /* UIImage+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		0A9EB10C2242DFE70047223E /* UnsafeMutablePointer+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnsafeMutablePointer+Extension.swift"; sourceTree = "<group>"; };
 		0A9EB10D2242DFE70047223E /* Array+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
-		0A9EB11B22443EB90047223E /* PoseModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PoseModel.mlmodel; sourceTree = SOURCE_ROOT; };
 		0A9EB121224445E70047223E /* poseDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = poseDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A9EB123224445E70047223E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0A9EB125224445E70047223E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -106,6 +105,7 @@
 		D9C4F7A3A251651131387A53 /* Pods-Pose.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pose.release.xcconfig"; path = "Pods/Target Support Files/Pods-Pose/Pods-Pose.release.xcconfig"; sourceTree = "<group>"; };
 		DD02997F68EDEE3E8F41BC81 /* Pods_Pose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE60EB1E80CC2D8F3765F4EB /* Pods_poseDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_poseDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1E182412264827D008231ED /* PoseModel.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = PoseModel.mlmodel; path = CoreMLModels/PoseModel.mlmodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,7 +142,7 @@
 		0A9EB0DB2242D1F70047223E = {
 			isa = PBXGroup;
 			children = (
-				0A9EB11B22443EB90047223E /* PoseModel.mlmodel */,
+				F1E182412264827D008231ED /* PoseModel.mlmodel */,
 				0A9EB1092242DFE70047223E /* Extensions */,
 				0A9EB0E82242D1F80047223E /* Pose.h */,
 				0A9EB13F224B4A5D0047223E /* PoseCommon.swift */,
@@ -489,7 +489,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0A9EB0F42242D1F80047223E /* poseTests.swift in Sources */,
-				0A9EB11C22443EB90047223E /* PoseModel.mlmodel in Sources */,
+				F1E18244226489A2008231ED /* PoseModel.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -498,9 +498,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0A9EB126224445E70047223E /* ViewController.swift in Sources */,
+				F1E18243226489A0008231ED /* PoseModel.mlmodel in Sources */,
 				0A9EB124224445E70047223E /* AppDelegate.swift in Sources */,
 				0A1ADA30225BB1C40057CD16 /* ImageCollectionViewCell.swift in Sources */,
-				0A9EB141225A5C140047223E /* PoseModel.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

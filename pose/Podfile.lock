@@ -3,7 +3,7 @@ PODS:
   - SwiftyBeaver (1.6.2)
 
 DEPENDENCIES:
-  - CoreMLHelpers (from `git://github.com/hollance/CoreMLHelpers`)
+  - CoreMLHelpers (from `git://github.com/rdv0011/CoreMLHelpers`)
   - SwiftyBeaver
 
 SPEC REPOS:
@@ -12,17 +12,17 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   CoreMLHelpers:
-    :git: git://github.com/hollance/CoreMLHelpers
+    :git: git://github.com/rdv0011/CoreMLHelpers
 
 CHECKOUT OPTIONS:
   CoreMLHelpers:
-    :commit: 6df452776c94cd55f576ad6d1ae04b7d49b3d50e
-    :git: git://github.com/hollance/CoreMLHelpers
+    :commit: 70de4d8ce93e8a32618613f801403290e69edc4c
+    :git: git://github.com/rdv0011/CoreMLHelpers
 
 SPEC CHECKSUMS:
   CoreMLHelpers: 6d0b6e69d950ed1abce6866c44e9441587b8f9dc
   SwiftyBeaver: 8e67ab3cd94389cbbb7a9c7cc02748d98bfee68e
 
-PODFILE CHECKSUM: e2261a53db47fbb3992dad8854e1487200de9bc3
+PODFILE CHECKSUM: 167d985d6410364cbfc6f1135f23219c3f7e56e3
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.5.3

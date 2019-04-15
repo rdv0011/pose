@@ -1,7 +1,12 @@
 To create Core ML model do the following:
 1) Install python and CoreML tools: https://apple.github.io/coremltools/generated/coremltools.converters.caffe.convert.html
-2) Run models/getModels.sh to get the original openpose models
-3) run python convertModel.py
+2) Run models/getModels.sh from openPose project (https://github.com/CMU-Perceptual-Computing-Lab/openpose) to get the original openpose models
+3) Create a link to the models directory. Let's assume that the pose framework project and openpose project are in the home directory,
+  then command to create a link would be the following:
+
+  ln -s ~/openpose/models ~/models 
+
+4) Go to the ~/pose/pose/CoreMLModels and run python convertModel.py
 
 The above mentioned script has hardcoded values to the file pose_deploy_linevec_faster_4_stages_fixed_size.prototxt and model file pose_iter_160000.caffemodel.
 They could be changed to other model but please do not forget to change the .prototxt file to have fixed size of the input image:
