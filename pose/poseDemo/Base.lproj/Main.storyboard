@@ -21,8 +21,8 @@
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="UNZ-qa-48N">
                                 <rect key="frame" x="0.0" y="20" width="375" height="647"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Ua8-Ll-eBO">
-                                    <size key="itemSize" width="375" height="193"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Ua8-Ll-eBO">
+                                    <size key="itemSize" width="256" height="256"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -33,20 +33,19 @@
                                 </activityIndicatorView>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ImageCollectionViewCell" id="t1k-W7-BkC" customClass="ImageCollectionViewCell" customModule="poseDemo" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="193"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="256" height="256"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="193"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="256" height="256"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="weO-W7-p2F">
-                                                    <rect key="frame" x="8" y="28" width="359" height="157"/>
+                                                    <rect key="frame" x="8" y="28" width="240" height="220"/>
                                                 </imageView>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Desc" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jdO-dU-PVD">
-                                                    <rect key="frame" x="316" y="40" width="39" height="21"/>
-                                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" alpha="0.84999999999999998" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Desc" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jdO-dU-PVD">
+                                                    <rect key="frame" x="159" y="40" width="77" height="11"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="9"/>
+                                                    <color key="textColor" red="1" green="0.0" blue="0.0198914904" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -55,6 +54,7 @@
                                             <constraint firstItem="jdO-dU-PVD" firstAttribute="top" secondItem="t1k-W7-BkC" secondAttribute="topMargin" constant="12" id="2tq-L7-3iZ"/>
                                             <constraint firstAttribute="bottomMargin" secondItem="weO-W7-p2F" secondAttribute="bottom" id="4My-cB-VWX"/>
                                             <constraint firstAttribute="trailingMargin" secondItem="jdO-dU-PVD" secondAttribute="trailing" constant="12" id="GND-u6-gxX"/>
+                                            <constraint firstItem="jdO-dU-PVD" firstAttribute="width" secondItem="t1k-W7-BkC" secondAttribute="width" multiplier="0.3" id="Klx-Yr-ppB"/>
                                             <constraint firstItem="weO-W7-p2F" firstAttribute="top" secondItem="t1k-W7-BkC" secondAttribute="topMargin" id="Pns-aF-6ak"/>
                                             <constraint firstAttribute="trailingMargin" secondItem="weO-W7-p2F" secondAttribute="trailing" id="Ywm-74-dPX"/>
                                             <constraint firstItem="weO-W7-p2F" firstAttribute="leading" secondItem="t1k-W7-BkC" secondAttribute="leadingMargin" id="ns2-Ru-8E3"/>

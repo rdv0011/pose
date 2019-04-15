@@ -9,6 +9,7 @@
 import UIKit
 import CoreML
 import Pose
+import Zoomy
 
 class ViewController: UIViewController {
     @IBOutlet weak var viewCollection: UICollectionView!
@@ -24,8 +25,8 @@ class ViewController: UIViewController {
         return testImage
     }()
     private var imageCount = 0
-    private static let totalImagesCount = 4 + 84
-    private var imageCach: [UIImage?] = Array(repeating: nil, count: ViewController.totalImagesCount)
+    private static let totalImagesCount = 5 + 84
+    private var imageCache: [UIImage?] = Array(repeating: nil, count: ViewController.totalImagesCount)
     private var jointsWithConnectionsByLayersProcesing = false
 
     override func viewDidLoad() {
@@ -67,6 +68,12 @@ extension ViewController: UICollectionViewDataSource {
         imageFor(row: indexPath.row) { image in
             cell.imageView.image = image
         }
+        cell.descriptionLabel.text = description(for: indexPath.row)
+        
+        let settings = Settings.defaultSettings
+            .with(actionOnTapOverlay: Action.dismissOverlay)
+            .with(actionOnDoubleTapImageView: Action.zoomIn)
+        addZoombehavior(for: cell.imageView, settings: settings)
         
         return cell
     }
@@ -74,18 +81,37 @@ extension ViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
+    
+    private func description(for row: Int) -> String {
+        switch row {
+        case 0:
+            return "Final pose on top of an original image"
+        case 1:
+            return "HeatMap matrices combined into one image.\nDifferent parts are higlighted with a color."
+        case 2:
+            return "PAFs matrices combined into one image.\nDifferent parts are higlighted with a color."
+        case 3:
+            return "HeatMap candidates. A color intensity represent a candidates's confidence."
+        case 4:
+            return "Filtered version of the HeatMap candidates."
+        case 5..<83:
+            return "HeatMap with PAFs that might be used together to create  a connecton."
+        default:
+            return ""
+        }
+    }
 }
 
 extension ViewController {
     func imageFor(row: Int, completion: @escaping ((UIImage)->())) {
-        if let image = imageCach[row] {
+        if let image = imageCache[row] {
             completion(image)
             return
         }
         
         let completionBlock: ((UIImage)->()) = { image in
             DispatchQueue.main.async {
-                self.imageCach[row] = image
+                self.imageCache[row] = image
                 completion(image)
             }
         }
@@ -96,17 +122,19 @@ extension ViewController {
         case 1:
             pose.heatMapLayersCombined(completion: completionBlock)
         case 2:
-            pose.heatMapCandidatesImage(completion: completionBlock)
+            pose.pafLayersCombinedImage(completion: completionBlock)
         case 3:
+            pose.heatMapCandidatesImage(completion: completionBlock)
+        case 4:
             pose.filteredHeatMapCandidatesImage(completion: completionBlock)
-        case 4..<83:
+        case 5..<83:
             if !jointsWithConnectionsByLayersProcesing {
                 jointsWithConnectionsByLayersProcesing = true
                 pose.jointsWithConnectionsByLayers { images in
                     DispatchQueue.main.async {
                         self.jointsWithConnectionsByLayersProcesing = false
                         images.enumerated().forEach { idx, element in
-                            self.imageCach[4 + idx] = element
+                            self.imageCache[5 + idx] = element
                         }
                         self.viewCollection.reloadData()
                         completion(images.first ?? UIImage())

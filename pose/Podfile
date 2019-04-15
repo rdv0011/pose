@@ -20,5 +20,6 @@ target 'poseDemo' do
     use_frameworks!
     
     pod 'CoreMLHelpers', :git => 'git://github.com/rdv0011/CoreMLHelpers'
+    pod 'Zoomy'
     
 end

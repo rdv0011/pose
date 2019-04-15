@@ -325,7 +325,7 @@ extension PoseEstimation {
             completion(self.networkOutput.drawMatricesCombined(matricesCount: heatMatCount,
                                                       width: self.modelConfig.outputWidh,
                                                       height: self.modelConfig.outputHeight,
-                                                      colors: Pose.colors))
+                                                      colors: Pose.colors).resized(to: self.modelConfig.inputSize))
         }
     }
     
@@ -338,8 +338,8 @@ extension PoseEstimation {
         
         let modelOutputWidth = modelConfig.outputWidh
         let modelOutputHeight = modelConfig.outputHeight
-        let backgroundLayer = networkOutput.slice(blockIndex: modelConfig.backgroundLayerIndex,
-                                                  blockSize: modelOutputLayerStride)
+        let backgroundLayer = Array(networkOutput.slice(blockIndex: modelConfig.backgroundLayerIndex,
+                                                  blockSize: modelOutputLayerStride))
         DispatchQueue.global(qos: .userInteractive).async {
             // Draw heatmap candidates for joints after NN output filtering
             // Use alpha to indicate candiates confidence
@@ -395,10 +395,10 @@ extension PoseEstimation {
             let pose = PoseModelConfigurationMPI15()
             pose.jointConnections.forEach { connection in
                 let (indexX, indexY) = connection.pafIndices
-                let pafMatX = self.networkOutput.slice(blockIndex: pafLayerStartIndex + indexX,
-                                                       blockSize: self.modelOutputLayerStride)
-                let pafMatY = self.networkOutput.slice(blockIndex: pafLayerStartIndex + indexY,
-                                                       blockSize: self.modelOutputLayerStride)
+                let pafMatX = Array(self.networkOutput.slice(blockIndex: pafLayerStartIndex + indexX,
+                                                       blockSize: self.modelOutputLayerStride))
+                let pafMatY = Array(self.networkOutput.slice(blockIndex: pafLayerStartIndex + indexY,
+                                                       blockSize: self.modelOutputLayerStride))
                 let pafXImage = pafMatX.draw(width: modelOutputWidth, height: modelOutputHeight)
                 let pafYImage = pafMatY.draw(width: modelOutputWidth, height: modelOutputHeight)
                 
@@ -413,10 +413,10 @@ extension PoseEstimation {
                 let (heatMapIndex1, heatMapIndex2) = (connection.joints.0.index(), connection.joints.1.index())
                 // Heatmap's starts from the zero index therefore no offset is needed for a 'heatMapIndex'
                 // 'heatMap1' corresponds to the first joint, 'heatMap2' to the second one
-                let heatMap1 = self.networkOutput.slice(blockIndex: heatMapIndex1,
-                                                        blockSize: self.modelOutputLayerStride)
-                let heatMap2 = self.networkOutput.slice(blockIndex: heatMapIndex2,
-                                                        blockSize: self.modelOutputLayerStride)
+                let heatMap1 = Array(self.networkOutput.slice(blockIndex: heatMapIndex1,
+                                                        blockSize: self.modelOutputLayerStride))
+                let heatMap2 = Array(self.networkOutput.slice(blockIndex: heatMapIndex2,
+                                                        blockSize: self.modelOutputLayerStride))
                 var heatMap1Image = heatMap1.draw(width: modelOutputWidth, height: modelOutputHeight)
                 var heatMap2Image = heatMap2.draw(width: modelOutputWidth, height: modelOutputHeight)
                 
@@ -500,13 +500,15 @@ extension PoseEstimation {
         let pafLayerStartIndex = self.modelConfig.pafLayerStartIndex
         let modelOutputLayerStride = self.modelOutputLayerStride
         
-        // Filter each heatmap layer by subtracting a min value
         let pafCount = layersCount - pafLayerStartIndex
         DispatchQueue.global(qos: .userInteractive).async {
             
+            // PAF matrices go from the pafLayerStartIndex till the end of the NN output array
+            let pafArray = Array(self.networkOutput[(pafLayerStartIndex * modelOutputLayerStride)...])
+            let pointer = UnsafeMutablePointer<Float>(mutating: pafArray)
             for layerIndex in 0..<pafCount {
-                var channelArray = self.networkOutput.slice(blockIndex: pafLayerStartIndex + layerIndex,
-                                                            blockSize: modelOutputLayerStride)
+                let layerPtr = pointer.advanced(by: layerIndex * modelOutputLayerStride)
+                let channelArray = pafArray.slice(blockIndex: layerIndex, blockSize: modelOutputLayerStride)
                 let keyFactor = Float(10000) // is used to make a key(integral value) out of float value
                 let valSet = NSCountedSet(array: channelArray.map { ($0 * keyFactor).rounded() })
                 let hist = valSet.sorted(by: { (a, b) -> Bool in
@@ -515,15 +517,14 @@ extension PoseEstimation {
                 if let last = hist.last as? Int {
                     let maxHist = Float(last) / keyFactor
                     for idx in 0..<modelOutputLayerStride {
-                        if channelArray[idx] < 0 {
-                            channelArray[idx] = abs(channelArray[idx] - maxHist)
+                        if layerPtr[idx] < 0 {
+                            layerPtr[idx] = abs(layerPtr[idx] - maxHist)
                         }
                     }
                 }
             }
-            let pafArray = Array(self.networkOutput[(pafLayerStartIndex * modelOutputLayerStride)...])
             let image = pafArray.drawMatricesCombined(matricesCount: pafCount, width: modelOutputWidth,
-                                                     height: modelOutputHeight, colors: Pose.colors)
+                                                     height: modelOutputHeight, colors: Pose.colors).resized(to: self.modelConfig.inputSize)
             completion(image)
         }
     }

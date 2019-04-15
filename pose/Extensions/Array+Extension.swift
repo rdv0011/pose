@@ -34,7 +34,7 @@ extension Array where Element == Float {
         for idx in stride(from: 0, to: size, by: matSize) {
             let endIndex = Swift.min(idx + matSize, self.count - 1)
             let matArray = Array(self[idx..<endIndex])
-            let color = colors[idx % colors.count]
+            let color = colors[(idx / matSize) % colors.count]
             let image = matArray.draw(width: width, height: height).tinted(with: color)
             if idx == 0 {
                 finalImage = image
@@ -48,10 +48,10 @@ extension Array where Element == Float {
     /// Returns a sub array. Given that the entire array is divided into blocks of equal size
     /// blockIndex - an index of the block
     /// blockSize - equals to block size
-    func slice(blockIndex: Int, blockSize: Int) -> Array {
+    func slice(blockIndex: Int, blockSize: Int) -> SubSequence {
         let idx = blockIndex * blockSize
         let endIdx = idx + blockSize
-        return Array(self[idx..<endIdx])
+        return self[idx..<endIdx]
     }
 }
 

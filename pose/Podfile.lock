@@ -1,14 +1,23 @@
 PODS:
   - CoreMLHelpers (0.2.0)
+  - InjectableLoggers (1.4.0)
+  - PureLayout (3.1.4)
   - SwiftyBeaver (1.6.2)
+  - Zoomy (2.0.0):
+    - InjectableLoggers (~> 1.0)
+    - PureLayout (~> 3.0)
 
 DEPENDENCIES:
   - CoreMLHelpers (from `git://github.com/rdv0011/CoreMLHelpers`)
   - SwiftyBeaver
+  - Zoomy
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - InjectableLoggers
+    - PureLayout
     - SwiftyBeaver
+    - Zoomy
 
 EXTERNAL SOURCES:
   CoreMLHelpers:
@@ -21,8 +30,11 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   CoreMLHelpers: 6d0b6e69d950ed1abce6866c44e9441587b8f9dc
+  InjectableLoggers: 990b09d8038dd0f22d851b911c01360ba40e7951
+  PureLayout: f08c01b8dec00bb14a1fefa3de4c7d9c265df85e
   SwiftyBeaver: 8e67ab3cd94389cbbb7a9c7cc02748d98bfee68e
+  Zoomy: cb014b48f815ae287ac37e14e8d53b5c12e22766
 
-PODFILE CHECKSUM: 167d985d6410364cbfc6f1135f23219c3f7e56e3
+PODFILE CHECKSUM: 5ffa3b0d33d8c1dfe5eaadde2734fda887243837
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.5.2
