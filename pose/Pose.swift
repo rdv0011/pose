@@ -431,7 +431,7 @@ extension PoseEstimation {
                                                  radius: 5,
                                                  lineWidth: 0.5,
                                                  on: heatMap1Image))
-                heatMap2Image = filteredJoints1.draw(width: modelOutputWidth,
+                heatMap2Image = filteredJoints2.draw(width: modelOutputWidth,
                                                      height: modelOutputHeight,
                                                      alpha: 1.0,
                                                      radius: 5,
