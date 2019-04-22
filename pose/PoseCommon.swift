@@ -66,6 +66,7 @@ public protocol PoseModelConfiguration {
     var outputHeight: Int { get }
     var inputSize: CGSize { get }
     var scoreThreasholdFactor: Float { get }
+    var jointConnectionsCount: Int { get }
 }
 
 public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
@@ -84,6 +85,9 @@ public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
     
     public var scoreThreasholdFactor: Float = 2
     
+    public var jointConnectionsCount: Int {
+        return jointConnections.count
+    }
     
     var joints = BodyJoint.array
     var jointConnections = JointConnection.array

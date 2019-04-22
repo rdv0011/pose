@@ -24,8 +24,13 @@ class ViewController: UIViewController {
         }
         return testImage
     }()
+    
+    private static var joitConnectionCombinedImagesCount: Int {
+        let pose = PoseModelConfigurationMPI15()
+        return pose.jointConnectionsCount * 4
+    }
     private var imageCount = 0
-    private static let totalImagesCount = 5 + 84
+    private static let totalImagesCount = 5 + ViewController.joitConnectionCombinedImagesCount
     private var imageCache: [UIImage?] = Array(repeating: nil, count: ViewController.totalImagesCount)
     private var jointsWithConnectionsByLayersProcesing = false
 
@@ -85,17 +90,17 @@ extension ViewController: UICollectionViewDataSource {
     private func description(for row: Int) -> String {
         switch row {
         case 0:
-            return "Final pose on top of an original image"
+            return "A final pose on the top of an original image."
         case 1:
-            return "HeatMap matrices combined into one image.\nDifferent parts are higlighted with a color."
+            return "HeatMap matrices are combined into one image.\nParts are higlighted with with different colors."
         case 2:
-            return "PAFs matrices combined into one image.\nDifferent parts are higlighted with a color."
+            return "PAFs matrices combined into a one image.\nParts are higlighted with different colors."
         case 3:
-            return "HeatMap candidates. A color intensity represent a candidates's confidence."
+            return "HeatMap candidates. A color intensity represents a candidates's confidence."
         case 4:
             return "Filtered version of the HeatMap candidates."
-        case 5..<83:
-            return "HeatMap with PAFs that might be used together to create  a connecton."
+        case 5..<ViewController.totalImagesCount - 1:
+            return "HeatMap with PAFs are used together to create a connection between joints."
         default:
             return ""
         }
@@ -127,7 +132,7 @@ extension ViewController {
             pose.heatMapCandidatesImage(completion: completionBlock)
         case 4:
             pose.filteredHeatMapCandidatesImage(completion: completionBlock)
-        case 5..<83:
+        case 5..<ViewController.totalImagesCount - 1:
             if !jointsWithConnectionsByLayersProcesing {
                 jointsWithConnectionsByLayersProcesing = true
                 pose.jointsWithConnectionsByLayers { images in

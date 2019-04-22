@@ -27,7 +27,7 @@ open class PoseEstimation {
     private(set) var networkOutput: Array<Float> = []
     private(set) var heatMapCandidates: [HeatMapJointCandidate] = []
     private(set) var filteredHeatMapCandidates: [HeatMapJointCandidate] = []
-    private(set) var connectionCandidates: [JointConnectionWithScore] = []
+    private(set) var allConnectionCandidates: [JointConnectionWithScore] = []
     private(set) var humanConnections: [Int: [JointConnectionWithScore]] = [:]
     
     public init(model: MLModel, modelConfig: PoseModelConfiguration) {
@@ -222,8 +222,9 @@ extension PoseEstimation {
                     // Map layerIndex to joint type
                     let candidatesByJoints = Dictionary(grouping: self.filteredHeatMapCandidates, by: { pose.joints[$0.layerIndex] })
                     // Get joint connections with scores based on PAF matrices
-                    var allConnectionCandidates: [JointConnectionWithScore] = []
+                    self.allConnectionCandidates = []
                     var connections: [JointConnectionWithScore] = []
+                    var connectionCandidates: [JointConnectionWithScore] = []
                     pose.jointConnections.forEach { connection in
 
                         let (indexX, indexY) = connection.pafIndices
@@ -237,7 +238,7 @@ extension PoseEstimation {
                         if let candidate1 = candidatesByJoints[joint1],
                             let candidate2 = candidatesByJoints[joint2] {
                             
-                            self.connectionCandidates = []
+                            connectionCandidates = []
                             
                             // Enumerate through non filtered joint connections
                             candidate1.enumerated().forEach { offset1, first in
@@ -259,14 +260,14 @@ extension PoseEstimation {
                                                                                       offsetJoint2: offset2,
                                                                                       joint1: jointPoint1,
                                                                                       joint2: jointPoint2)
-                                        self.connectionCandidates.append(connWithCoords)
+                                        connectionCandidates.append(connWithCoords)
                                     }
                                 }
                             }
-                            allConnectionCandidates += self.connectionCandidates
+                            self.allConnectionCandidates += connectionCandidates
                             
                             var (usedIdx1, usedIdx2) = (Set<Int>(), Set<Int>())
-                            self.connectionCandidates.sorted(by: { $0.score > $1.score }).forEach { c in
+                            connectionCandidates.sorted(by: { $0.score > $1.score }).forEach { c in
                                 if usedIdx1.contains(c.offsetJoint1) || usedIdx2.contains(c.offsetJoint2) {
                                     return
                                 }
@@ -367,7 +368,7 @@ extension PoseEstimation {
     public func jointsWithConnectionsImage(completion: @escaping ((UIImage)->())) {
         DispatchQueue.global(qos: .userInteractive).async {
             // Draw all connecions using a score as an alpha
-            let allConnectionsImage = self.connectionCandidates.draw(width: self.modelConfig.outputWidh,
+            let allConnectionsImage = self.allConnectionCandidates.draw(width: self.modelConfig.outputWidh,
                                                                    height: self.modelConfig.outputHeight,
                                                                    lineWidth: 5,
                                                                    on: UIImage.image(with: .white, size: self.modelConfig.inputSize))
@@ -382,7 +383,7 @@ extension PoseEstimation {
     
     public func jointsWithConnectionsByLayers(completion: @escaping (([UIImage])->())) {
         guard networkOutput.count >= modelConfig.layersCount * self.modelOutputLayerStride else {
-            log.error("The netowrk output array has an incorrect size or it was not set")
+            log.error("The network output array has an incorrect size or it was not set")
             completion([UIImage()])
             return
         }
@@ -407,7 +408,7 @@ extension PoseEstimation {
                 let joints2 = self.heatMapCandidates.filter({ $0.layerIndex == connection.joints.1.index()})
                 let filteredJoints1 = self.filteredHeatMapCandidates.filter({ $0.layerIndex == connection.joints.0.index()})
                 let filteredJoints2 = self.filteredHeatMapCandidates.filter({ $0.layerIndex == connection.joints.1.index()})
-                let jointConns = self.connectionCandidates.filter({ $0.connection == connection })
+                let jointConns = self.allConnectionCandidates.filter({ $0.connection == connection })
                 
                 // The index of joint is equal to a heatmap index
                 let (heatMapIndex1, heatMapIndex2) = (connection.joints.0.index(), connection.joints.1.index())
@@ -420,6 +421,7 @@ extension PoseEstimation {
                 var heatMap1Image = heatMap1.draw(width: modelOutputWidth, height: modelOutputHeight)
                 var heatMap2Image = heatMap2.draw(width: modelOutputWidth, height: modelOutputHeight)
                 
+                // Draw joint candidates on the heat map layers
                 heatMap1Image = filteredJoints1.draw(width: modelOutputWidth,
                                                      height: modelOutputHeight,
                                                      alpha: 1.0,
@@ -442,26 +444,39 @@ extension PoseEstimation {
                                                  radius: 5,
                                                  lineWidth: 0.5,
                                                  on: heatMap2Image))
-                resultImages.append(filteredJoints1.draw(width: modelOutputWidth,
+                // Draw joint candidates and connections on the PAFs layers
+                var pafXJointsConnectionsImage = filteredJoints1.draw(width: modelOutputWidth,
                                                          height: modelOutputHeight,
                                                          alpha: 1.0,
                                                          radius: 7,
                                                          lineWidth: 3,
-                                                         on: pafXImage.resized(to: modelInputSize)))
-                resultImages.append(filteredJoints2.draw(width: modelOutputWidth,
+                                                         on: pafXImage.resized(to: modelInputSize))
+                pafXJointsConnectionsImage = filteredJoints2.draw(width: modelOutputWidth,
+                                                                      height: modelOutputHeight,
+                                                                      alpha: 1.0,
+                                                                      radius: 7,
+                                                                      lineWidth: 3,
+                                                                      on: pafXJointsConnectionsImage)
+                var pafYJointsConnectionsImage = filteredJoints1.draw(width: modelOutputWidth,
                                                          height: modelOutputHeight,
                                                          alpha: 1.0,
                                                          radius: 7,
                                                          lineWidth: 3,
-                                                         on: pafYImage.resized(to: modelInputSize)))
+                                                         on: pafYImage.resized(to: modelInputSize))
+                pafYJointsConnectionsImage = filteredJoints2.draw(width: modelOutputWidth,
+                                                                      height: modelOutputHeight,
+                                                                      alpha: 1.0,
+                                                                      radius: 7,
+                                                                      lineWidth: 3,
+                                                                      on: pafYJointsConnectionsImage)
                 resultImages.append(jointConns.draw(width: modelOutputWidth,
                                                     height: modelOutputHeight,
                                                     lineWidth: 3,
-                                                    on: pafXImage.resized(to: modelInputSize)))
+                                                    on: pafXJointsConnectionsImage))
                 resultImages.append(jointConns.draw(width: modelOutputWidth,
                                                     height: modelOutputHeight,
                                                     lineWidth: 3,
-                                                    on: pafYImage.resized(to: modelInputSize)))
+                                                    on: pafYJointsConnectionsImage))
             }
             completion(resultImages)
         }
@@ -473,7 +488,7 @@ extension PoseEstimation {
             completion(UIImage())
             return
         }
-        // Draw human joints and connections over an input image
+        // Draws human joints and connections over an input image
         DispatchQueue.global(qos: .userInteractive).async {
             var resultImage = overImage.grayed
             self.humanConnections.forEach { h in
@@ -490,7 +505,7 @@ extension PoseEstimation {
     
     public func pafLayersCombinedImage(completion: @escaping ((UIImage)->())) {
         guard networkOutput.count >= modelConfig.layersCount * self.modelOutputLayerStride else {
-            log.error("The netowrk output array has an incorrect size or it was not set")
+            log.error("The network output array has an incorrect size or it was not set")
             completion(UIImage())
             return
         }
