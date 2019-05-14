@@ -3,7 +3,7 @@ This framework helps to estimate the human pose on an image. The parts of the hu
 
 <img src="sample-images/human-pose-joints-and-parts-MPI15.svg?sanitize=true&raw=true" />
 
-| For the demo purposes the original image was taken from [Magic Poser](https://magicposer.com/)                 | The result human pose estimation drawn over the original image   |
+| For the demo purposes I took images with myself)                 | The result human pose estimation drawn over the original image   |
 | ---------------------------------------------------------------------------------------------------------------------------- |:---------------------------------------------------------------------------:|
 | <img src="pose/poseDemo/Assets.xcassets/sample-pose1-resized.imageset/sample-pose1-resized.png" /> | <img src="sample-images/pose-result.png" />                                                        |
 
