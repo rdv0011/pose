@@ -67,5 +67,21 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 | <img src="sample-images/PAF-X-head-neck-connection.png?sanitize=true&raw=true" /> | <img src="sample-images/PAF-X-LShoulder-LElbow-connection.png?sanitize=true&raw=true" />|
 
 ## Performance
+| Neural network input size      | Time to process one frame iPhone 5S         | Time to process one frame iPhone XR       |
+| --------------------------------- |:-------------------------------------------------:|-------------------------------------------------:|
+| 512 x 512                               |                                                                      |                                                                      |
+| 256 x 256                               |                                                                       |                                                                      |
 
+## Applications
+
+### Helthcare
+
+1) Detecting anomalies in the human spine:
+<img src="sample-images/pose-result-scoliosis.png?sanitize=true&raw=true" />
+2) Guiding for healthcare exercises.
+
+### Home security and automation
+
+a) Detecting if onwers at home and check if all the equipment is switched off (iron / owen).
+b) Locating people inside the living area and providng automation (turn on lights / music / tv)
 
