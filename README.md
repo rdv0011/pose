@@ -1,7 +1,7 @@
 # Human Pose estimation
 This framework helps to estimate the human pose on an image. The parts of the human body used in this project are shown on the follwoing image:
 
-<img src="sample-images/human-pose-joints-and-parts-MPI15.svg?sanitize=true&raw=true" />
+<img src="sample-images/vitruvian_shape.png?sanitize=true&raw=true" />
 
 | For the demo purposes I took images with myself)                 | The result human pose estimation drawn over the original image   |
 | ---------------------------------------------------------------------------------------------------------------------------- |:---------------------------------------------------------------------------:|
