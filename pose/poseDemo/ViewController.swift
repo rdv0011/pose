@@ -10,11 +10,13 @@ import UIKit
 import CoreML
 import Pose
 import Zoomy
+import SwiftyBeaver
 
 class ViewController: UIViewController {
     @IBOutlet weak var viewCollection: UICollectionView!
     @IBOutlet weak var viewCollectionFlow: UICollectionViewFlowLayout!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    private let log = SwiftyBeaver.self
     
     private let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
     private lazy var testImage: UIImage  = {
@@ -45,6 +47,7 @@ class ViewController: UIViewController {
         activityIndicator.startAnimating()
         pose.estimate(on: testImage) { humans in
             DispatchQueue.main.async {
+                self.log.debug("CoreML processing time \(self.pose.coreMLProcessingTime) ms")
                 self.imageCount = ViewController.totalImagesCount
                 self.activityIndicator.stopAnimating()
                 self.viewCollection.reloadData()

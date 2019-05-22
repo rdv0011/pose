@@ -9,22 +9,29 @@ This framework helps to estimate the human pose on an image. The parts of the hu
 
 ## Preparing the model
 To start using the framework a Core ML model is needed to be created. This model is based on one from the [openpose project](https://github.com/CMU-Perceptual-Computing-Lab/openpose). To create a model do the following:
-1) Install Python and CoreML tools: https://apple.github.io/coremltools/generated/coremltools.converters.caffe.convert.html
+1) Install Python and [CoreML tools](https://apple.github.io/coremltools/index.html)
 2) Run models/getModels.sh from [Open Pose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) to get the original openpose models
-3) Create a link to the models directory. Let's assume that the pose framework project and openpose project are in the home directory, then command to create a link would be the following:
+3) Copy models/pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt to models/pose/mpi/pose_deploy_linevec_faster_4_stages_fixed_size.prototxt
+4) Change the following in the file pose_deploy_linevec_faster_4_stages_fixed_size.prototxt:
+```
+input_dim: 1 # This value will be defined at runtime ->  input_dim: 512
+input_dim: 1 # This value will be defined at runtime ->  input_dim: 512
+```
+5) Create a link to the models directory. Let's assume that the pose framework project and openpose project are in the home directory, then command to create a link would be the following:
 
 `ln -s ~/openpose/models ~/models`
 
-4) Go to the ~/pose/pose/CoreMLModels and run the following command:
+6) Go to the ~/pose/pose/CoreMLModels and run the following command:
 
 `python convertModel.py`
 
 The above mentioned script contains hardcoded values to the file pose_deploy_linevec_faster_4_stages_fixed_size.prototxt and model file pose_iter_160000.caffemodel.
 They could be changed to some other model but please do not forget to change the .prototxt file to have fixed size of the input image:
-input_dim: 512  - corresponds to the with of the NN input.
-input_dim: 512  - corresponds to the height of the NN input.
+input_dim: XXX  - corresponds to the with of the NN input.
+input_dim: XXX  - corresponds to the height of the NN input.
+Also **do not forget to change the model configuration PoseModelConfigurationMPI15.inputSize to a specified input values** and use this configuration instead an existing one in hte framework which sets 512x512 as an input size.
 
-Any values will work but the best results could be achieved if an aspect ratio matches the one that an original image has. Also it should be taken into account that bigger values will affect the performance more.
+Any values will work but the best results could be achieved if an aspect ratio matches the one that an original image has. Also it should be taken into account that bigger values will affect the performance significantly which is shown in the [Performance](#Performance) .
 
 ## Neural network output details
 The output of the MPI15 model is a group of matrices whith dimensions `(input_image_width / 8, input_image_height / 8)`. Each element in the matrix has float type. Mapping between matrix index in the output and the body part:
@@ -67,14 +74,22 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 | <img src="sample-images/PAF-X-head-neck-connection.png?sanitize=true&raw=true" /> | <img src="sample-images/PAF-X-LShoulder-LElbow-connection.png?sanitize=true&raw=true" />|
 
 ## Performance
-| Neural network input size      | Time to process one frame iPhone 5S         | Time to process one frame iPhone XR       |
-| --------------------------------- |:-------------------------------------------------:|-------------------------------------------------:|
-| 512 x 512                               |                                                                      |                                                                      |
-| 256 x 256                               |                                                                       |                                                                      |
+
+### Time to process one frame
+
+|   NN input size    | iPhone XR (ms)   | iPhone 8 (ms) | iPhone 5S (ms) |
+| ------------------- |-------------------:|-----------------:|------------------:|
+|      512 x 512       |          210            |      3670          |        20801        |
+|      256 x 256       |          100            |       868           |         7162         |
+
+### The result pose depending on the NN input size (the faster it is the less accurate result)
+|      512 x 512       |    256 x 256       |
+| ---------------------------------------------------------------------------------------- |--------------------------------------------------------------------------------------------------------:|
+|     <img src="sample-images/pose-result.png?sanitize=true&raw=true" />       |          <img src="sample-images/pose-result-256x256.png?sanitize=true&raw=true" />       |
 
 ## Applications
 
-### Helthcare
+### Healthcare
 
 1) Detecting anomalies in the human spine:
 <img src="sample-images/pose-result-scoliosis.png?sanitize=true&raw=true" />

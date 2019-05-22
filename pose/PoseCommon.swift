@@ -71,17 +71,21 @@ public protocol PoseModelConfiguration {
 
 public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
 
+    public var inputSize = CGSize(width: 512, height: 512)
+
+    public var outputHeight: Int {
+        return Int(inputSize.height / 8)
+    }
+
     public var layersCount: Int = 44
     
     public var backgroundLayerIndex: Int = 15
     
     public var pafLayerStartIndex: Int = 16
     
-    public var outputWidh: Int = 64
-    
-    public var outputHeight: Int = 64
-    
-    public var inputSize: CGSize = CGSize(width: 512, height: 512)
+    public var outputWidh: Int {
+        return Int(inputSize.width / 8)
+    }
     
     public var scoreThreasholdFactor: Float = 2
     

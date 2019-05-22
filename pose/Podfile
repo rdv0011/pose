@@ -5,7 +5,7 @@ target 'Pose' do
   use_frameworks!
   
   pod 'CoreMLHelpers', :git => 'git://github.com/rdv0011/CoreMLHelpers'
-  pod 'SwiftyBeaver'
+  pod 'SwiftyBeaver', '1.7.0', :inhibit_warnings => true        # https://github.com/SwiftyBeaver/SwiftyBeaver
 
 end
 

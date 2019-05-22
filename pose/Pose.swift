@@ -171,9 +171,8 @@ extension PoseEstimation {
                 
                 if let multiArray = try? multiArray?.reshaped(to: [layersCount,
                                                                    modelOutputWidth,
-                                                                   modelOutputHeight]),
-                    let reshapedArray = multiArray {
-                    
+                                                                   modelOutputHeight]) {
+                    let reshapedArray = multiArray
                     let nnOutput = UnsafeMutablePointer<Float32>(OpaquePointer(reshapedArray.dataPointer))
                     let layerStride = reshapedArray.strides[0].intValue
                     let heatMatCount = backgroundLayerIndex
@@ -300,6 +299,8 @@ extension PoseEstimation {
                         }
                     }
                     completion(self.humanConnections)
+                } else {
+                    self.log.debug("Failed to re-shape a multy array \(String(describing: multiArray))")
                 }
             }
         }
@@ -315,10 +316,7 @@ extension PoseEstimation {
     
     public var coreMLProcessingTime: String {
         let timeElapsed = coremlProcessingFinish.timeIntervalSince(coremlProcessingStart)
-        let formatter: NumberFormatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 2
-        return formatter.string(from: NSNumber(value: timeElapsed)) ?? ""
+        return String(format: "%d", Int(timeElapsed * 1000))
     }
     
     public func heatMapLayersCombined(completion: @escaping ((UIImage)->())) {
