@@ -16,7 +16,10 @@
    version="1.1"
    id="svg8"
    sodipodi:docname="vitruvian_shape.svg"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06">
+   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   inkscape:export-filename="/Users/dmitry/Documents/pose/sample-images/vitruvian_shape.png"
+   inkscape:export-xdpi="93.805046"
+   inkscape:export-ydpi="93.805046">
   <defs
      id="defs2">
     <marker
@@ -351,9 +354,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.87651776"
-     inkscape:cx="334.67385"
-     inkscape:cy="855.06427"
+     inkscape:zoom="1"
+     inkscape:cx="289.29014"
+     inkscape:cy="541.32721"
      inkscape:document-units="mm"
      inkscape:current-layer="layer2"
      showgrid="false"
@@ -399,7 +402,9 @@
        width="208.28157"
        height="294.31091"
        x="6.0371451"
-       y="0.87793308" />
+       y="0.87793308"
+       inkscape:export-xdpi="37.508739"
+       inkscape:export-ydpi="37.508739" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332;"

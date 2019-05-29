@@ -82,7 +82,7 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 |      512 x 512       |          210            |      3670          |        20801        |
 |      256 x 256       |          100            |       868           |         7162         |
 
-### The result pose depending on the NN input size (the faster it is the less accurate result)
+### The result pose depending on the NN input size (the smaller and faster the less accurate result is)
 |      512 x 512       |    256 x 256       |
 | ---------------------------------------------------------------------------------------- |--------------------------------------------------------------------------------------------------------:|
 |     <img src="sample-images/pose-result.png?sanitize=true&raw=true" />       |          <img src="sample-images/pose-result-256x256.png?sanitize=true&raw=true" />       |
@@ -91,12 +91,12 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 
 ### Healthcare
 
-1) Detecting anomalies in the human spine:
+1) Detecting anomalies in the human spine on still images:
 <img src="sample-images/pose-result-scoliosis.png?sanitize=true&raw=true" />
-2) Guiding for healthcare exercises.
+2) Health and fitness guide.
 
-### Home security and automation
+### Home security and automation (not related to mobile phones)
 
-a) Detecting if onwers at home and check if all the equipment is switched off (iron / owen).
-b) Locating people inside the living area and providng automation (turn on lights / music / tv)
+a) Detecting if people at home and check if all the equipment is switched off (iron / owen).
+b) Locating people inside the living area and do automation (turn on lights / music / tv)
 
