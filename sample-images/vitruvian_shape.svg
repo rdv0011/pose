@@ -355,15 +355,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="289.29014"
-     inkscape:cy="541.32721"
+     inkscape:cx="344.29014"
+     inkscape:cy="1101.3272"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1440"
      inkscape:window-height="808"
-     inkscape:window-x="42"
-     inkscape:window-y="30"
+     inkscape:window-x="-2"
+     inkscape:window-y="0"
      inkscape:window-maximized="0"
      showguides="true"
      inkscape:guide-bbox="true">
@@ -396,15 +396,6 @@
      transform="translate(-4.8297177,0.90557207)"
      inkscape:groupmode="layer"
      style="opacity:0.76000001">
-    <rect
-       style="fill:#ffeeaa;fill-opacity:1;stroke:#000000;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter5243)"
-       id="rect5227"
-       width="208.28157"
-       height="294.31091"
-       x="6.0371451"
-       y="0.87793308"
-       inkscape:export-xdpi="37.508739"
-       inkscape:export-ydpi="37.508739" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.3499999px;line-height:1.25;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332;"
@@ -463,13 +454,13 @@
        cy="87.980438"
        r="39.288624" />
     <circle
-       style="opacity:0.7;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.26458332;stroke-opacity:1"
+       style="opacity:0.7;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.265;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:0.265,0.265;stroke-dashoffset:0"
        id="path819"
        cx="107.44234"
        cy="120.85466"
        r="95.147957" />
     <rect
-       style="opacity:0.7;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="opacity:0.7;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:0.26499999,0.26499999;stroke-opacity:1;stroke-dashoffset:0"
        id="rect821"
        width="166.77618"
        height="166.77618"
