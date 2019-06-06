@@ -36,37 +36,37 @@ open class PoseEstimation {
         self.modelConfig = modelConfig
     }
     
-    private func stride(x1: Int, y1: Int, x2: Int, y2: Int,
-                processBlock: ((Int, Int, Int, Int) -> Void)) {
+    private func delta(x1: Int, y1: Int, x2: Int, y2: Int) -> (dx: Float, dy: Float, stepCount: Int) {
         var (dx, dy) = (Float(abs(x2 - x1) + 1), Float(abs(y2 - y1) + 1))
-        var stepCount = dy
-        if (dx >= dy) {
-            stepCount = dx
-        }
+        var stepCount  = (5 * max(abs(dx), abs(dy))).squareRoot()
+        stepCount = max(5, min(25, stepCount))
         dx /= stepCount
         dy /= stepCount
-        if x2 < x1 {
-            dx = -dx
-        }
-        if y2 < y1 {
-            dy = -dy
-        }
-        var (x, y) = (Float(x1), Float(y1))
-        let count = Int(stepCount.rounded())
-        (0..<count).forEach { idx in
-            processBlock(Int(x.rounded(.toNearestOrAwayFromZero)),
-                         Int(y.rounded(.toNearestOrAwayFromZero)), idx, count)
-            x += dx
-            y += dy
+        return (dx: dx, dy: dy, stepCount: Int(stepCount.rounded()))
+    }
+    
+    private func stride(x1: Int, y1: Int, x2: Int, y2: Int, processBlock: ((Int, Int, Int, Int) -> Void)) {
+        let (dx, dy, stepCount) = delta(x1: x1, y1: y1, x2: x2, y2: y2)
+        let (x0, y0) = (Float(x1), Float(y1))
+        (0..<stepCount).forEach { idx in
+            let x = Int((x0 + Float(idx) * dx).rounded(.toNearestOrAwayFromZero))
+            let y = Int((y0 + Float(idx) * dy).rounded(.toNearestOrAwayFromZero))
+            processBlock(x, y, idx, stepCount)
         }
     }
     
     private func score(x1: Int, y1: Int, x2: Int, y2: Int,
                pafMatX: Array<Float32>, pafMatY: Array<Float32>,
-               yStride: Int) -> (Float32, Int) {
+               yStride: Int) -> Float32 {
+        let vectorAToB = (x: Float32(x2 - x1), y: Float32(y2 - y1))
+        let vectorAToBLength = (pow(vectorAToB.x, 2) + pow(vectorAToB.y, 2)).squareRoot()
         
-        var pafXs = Array<Float32>()
-        var pafYs = Array<Float32>()
+        guard vectorAToBLength > 1e-6 else {
+            return -1
+        }
+        
+        let vectorAToBNorm = (x: vectorAToB.x / vectorAToBLength, y: vectorAToB.y / vectorAToBLength)
+        var PAFs: [Float32] = []
         
         stride(x1: x1, y1: y1, x2: x2, y2: y2) { x, y, idx, count in
             // These offset values are used to cover larger area in PAF's to collect as many score as possible
@@ -86,31 +86,31 @@ open class PoseEstimation {
                 //  x - 1   x, yn  x + 1
                 swap(&dx, &dy)
             }
-            var (scoreX, scoreY) = (Float(0), Float(0))
+
             for (dx, dy) in zip(dx, dy) {
                 var offset = (y + dy) * yStride + x + dx
                 // Check if it is out of array's bounds
                 offset = min(max(0, offset), pafMatX.count - 1)
                 // Accumulate PAFs values
-                scoreX += pafMatX[offset]
-                scoreY += pafMatY[offset]
+                PAFs.append(vectorAToBNorm.x * pafMatX[offset] + vectorAToBNorm.y * pafMatY[offset])
             }
-            pafXs.append(scoreX)
-            pafYs.append(scoreY)
         }
-        pafXs = pafXs.map({ abs($0) })
-        pafYs = pafYs.map({ abs($0) })
-        // Summ all the scores
-        let localScores = zip(pafXs, pafYs).map(+)
-        // The parts of the scores that crosses PAFs that belong to other connections should be penalized
-        // In that way the scores that belongs to correct connection will have more chances to win later
-        let localScoreMax = localScores.max() ?? Float(0.0)
-        let scorePenalty = -localScoreMax
-        let filteredLocalScores = localScores.map { localScoreMax / $0 > modelConfig.scoreThreasholdFactor ? scorePenalty: $0 }
         
-        log.debug("scores: [\(localScores)]\nfiltered_scores: [\(filteredLocalScores)]")
+        let pointCount = PAFs.count / 3 // it needs to be devided because there are three (dx, dy) pairs for each point
+        PAFs = PAFs.filter { $0 > modelConfig.interThreshold }
+        let sum = PAFs.reduce(0, +)
+        let scoresCount = PAFs.count
         
-        return (filteredLocalScores.reduce(0, +), filteredLocalScores.count )
+        if Float32(scoresCount) / Float32(pointCount) > modelConfig.interMinAboveThreshold {
+            return sum / Float32(scoresCount)
+        }
+        
+        let threshold = Float32(modelConfig.outputWidh * modelConfig.outputHeight).squareRoot() / 150
+        if vectorAToBLength < threshold {
+            return modelConfig.defaultNmsThreshold + 1e-6
+        }
+        
+        return -1
     }
     
     public func estimate(on image: UIImage, completion: @escaping (([Int: [JointConnectionWithScore]]) -> ())) {
@@ -169,10 +169,8 @@ extension PoseEstimation {
             
             withExtendedLifetime(multiArray) {
                 
-                if let multiArray = try? multiArray?.reshaped(to: [layersCount,
-                                                                   modelOutputWidth,
-                                                                   modelOutputHeight]) {
-                    let reshapedArray = multiArray
+                let reshapedArray = try? multiArray?.reshaped(to: [layersCount, modelOutputWidth, modelOutputHeight])
+                if let reshapedArray = reshapedArray {
                     let nnOutput = UnsafeMutablePointer<Float32>(OpaquePointer(reshapedArray.dataPointer))
                     let layerStride = reshapedArray.strides[0].intValue
                     let heatMatCount = backgroundLayerIndex
@@ -247,7 +245,7 @@ extension PoseEstimation {
                                     let (x1, y1) = (first.col, first.row)
                                     let (x2, y2) = (second.col, second.row)
                                     
-                                    let (s, c) = self.score(x1: x1, y1: y1, x2: x2, y2: y2,
+                                    let s = self.score(x1: x1, y1: y1, x2: x2, y2: y2,
                                                             pafMatX: pafMatX, pafMatY: pafMatY,
                                                             yStride: modelOutputWidth)
                                     if s > 0 {
@@ -255,7 +253,6 @@ extension PoseEstimation {
                                         let jointPoint2 = JointPoint(x: x2, y: y2)
                                         let connWithCoords = JointConnectionWithScore(connection: connection,
                                                                                       score: s,
-                                                                                      count: c,
                                                                                       offsetJoint1: offset1,
                                                                                       offsetJoint2: offset2,
                                                                                       joint1: jointPoint1,
@@ -543,3 +540,11 @@ extension PoseEstimation {
         }
     }
 }
+
+#if DEBUG
+extension PoseEstimation {
+    public func stride_testable(x1: Int, y1: Int, x2: Int, y2: Int, processBlock: ((Int, Int, Int, Int) -> Void)) {
+        self.stride(x1: x1, y1: y1, x2: x2, y2: y2, processBlock: processBlock)
+    }
+}
+#endif

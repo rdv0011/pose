@@ -19,17 +19,17 @@ class PoseTests: XCTestCase {
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-    
-    func testModel() {
-    }
 
-    func testExample() {
+    func testStride() {
 //        guard let testImage = UIImage(named: "sample-pose", in: Bundle(for: PoseTests.self), compatibleWith: nil) else {
 //            assertionFailure("Failed to open image")
 //            return
 //        }
 //
-//        let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
+        let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
+        pose.stride_testable(x1: 0, y1: 0, x2: 4, y2: 0) { (x, y, idx, stepCount) in
+            XCTAssertEqual(stepCount, 5, "The number of steps is incorrect")
+        }
 //        let estimationCompleted = XCTestExpectation(description: "Pose estimation has completed")
 //        pose.estimate(on: testImage) { humans in
 //            print(humans)

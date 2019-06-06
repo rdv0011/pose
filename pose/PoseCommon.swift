@@ -19,7 +19,6 @@ public struct JointPoint: Hashable {
 public struct JointConnectionWithScore {
     let connection: PoseModelConfigurationMPI15.JointConnection
     let score: Float32
-    let count: Int
     let offsetJoint1: Int
     let offsetJoint2: Int
     let joint1: JointPoint
@@ -67,12 +66,19 @@ public protocol PoseModelConfiguration {
     var inputSize: CGSize { get }
     var scoreThreasholdFactor: Float { get }
     var jointConnectionsCount: Int { get }
+    var interMinAboveThreshold: Float32 { get }
+    var interThreshold: Float32 { get }
+    var defaultNmsThreshold: Float32 { get }
 }
 
 public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
 
     public var inputSize = CGSize(width: 512, height: 512)
 
+    public var outputWidh: Int {
+        return Int(inputSize.width / 8)
+    }
+    
     public var outputHeight: Int {
         return Int(inputSize.height / 8)
     }
@@ -83,15 +89,15 @@ public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
     
     public var pafLayerStartIndex: Int = 16
     
-    public var outputWidh: Int {
-        return Int(inputSize.width / 8)
-    }
-    
     public var scoreThreasholdFactor: Float = 2
     
     public var jointConnectionsCount: Int {
         return jointConnections.count
     }
+    
+    public var interMinAboveThreshold: Float32 = Float32(0.75)
+    public var interThreshold: Float32 = Float32(0.01)
+    public var defaultNmsThreshold: Float32 = Float32(0.3) // for MPI with 4 stages that is a fast version
     
     var joints = BodyJoint.array
     var jointConnections = JointConnection.array

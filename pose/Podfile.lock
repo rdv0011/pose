@@ -1,6 +1,6 @@
 PODS:
   - CoreMLHelpers (0.2.0)
-  - InjectableLoggers (1.4.0)
+  - InjectableLoggers (1.5.0)
   - PureLayout (3.1.4)
   - SwiftyBeaver (1.7.0)
   - Zoomy (2.0.0):
@@ -30,11 +30,11 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   CoreMLHelpers: 6d0b6e69d950ed1abce6866c44e9441587b8f9dc
-  InjectableLoggers: 990b09d8038dd0f22d851b911c01360ba40e7951
+  InjectableLoggers: 78fc9d2daf273a328a086f998fa43de0a81912a8
   PureLayout: f08c01b8dec00bb14a1fefa3de4c7d9c265df85e
   SwiftyBeaver: 4cc0080d2e23f980652e28978db11a5c9da39165
   Zoomy: cb014b48f815ae287ac37e14e8d53b5c12e22766
 
 PODFILE CHECKSUM: d8b90933f6a5baa63e9c322c4b31a9b9435627ae
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.5.2
