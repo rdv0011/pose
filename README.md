@@ -3,9 +3,9 @@ This framework helps to estimate the human pose on an image. The parts of the hu
 
 <img src="sample-images/vitruvian_shape.png?sanitize=true&raw=true" />
 
-| For the demo purposes I took images with myself)                 | The result human pose estimation drawn over the original image   |
-| ---------------------------------------------------------------------------------------------------------------------------- |:---------------------------------------------------------------------------:|
-| <img src="pose/poseDemo/Assets.xcassets/sample-pose1-resized.imageset/sample-pose1-resized.png" /> | <img src="sample-images/pose-result.png" />                                                        |
+| For the demo purposes I took images with myself)                | The result human pose estimation drawn over the original image  |
+| :----------------------------------------------------------------------------------------------------------------------------: |:---------------------------------------------------------------------------:|
+| <img src="pose/poseDemo/Assets.xcassets/sample-pose1-resized.imageset/sample-pose1-resized.png" /> | <img src="sample-images/pose-result.png" /> |
 
 ## Preparing the model
 To start using the framework a Core ML model is needed to be created. This model is based on one from the [openpose project](https://github.com/CMU-Perceptual-Computing-Lab/openpose). To create a model do the following:
@@ -63,7 +63,7 @@ There are two types of output matices in the MPI15 model. The ones that represen
 The repository also contains a demo project 'poseDemo' that demonstrates usage of the framework.
 
 | Sample                                                                             | Images                                                                                              |
-| --------------------------------------------------------------- |:---------------------------------------------------------------------------:|
+| :---------------------------------------------------------------: |:---------------------------------------------------------------------------:|
 | Human pose result:                                                          | Heatmaps combined into one image. Each joint has its own color:|
 | <img src="sample-images/pose-result.png?sanitize=true&raw=true" /> |  <img src="sample-images/heatmaps.png?sanitize=true&raw=true" />                   |
 | PAFs combined into one image:                                      |   All heatmap candidates. Each candidate has its own confidence which defines its opacity on the image: |
@@ -78,13 +78,13 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 ### Time to process one frame
 
 |   NN input size    | iPhone XR (ms)   | iPhone 8 (ms) | iPhone 5S (ms) |
-| ------------------- |-------------------:|-----------------:|------------------:|
+|:-------------------:|:-------------------:|:-----------------:|:------------------:|
 |      512 x 512       |          210            |      3670          |        20801        |
 |      256 x 256       |          100            |       868           |         7162         |
 
 ### The result pose depending on the NN input size (the smaller and faster the less accurate result is)
 |      512 x 512       |    256 x 256       |
-| ---------------------------------------------------------------------------------------- |--------------------------------------------------------------------------------------------------------:|
+| :----------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------:|
 |     <img src="sample-images/pose-result.png?sanitize=true&raw=true" />       |          <img src="sample-images/pose-result-256x256.png?sanitize=true&raw=true" />       |
 
 ## Applications
@@ -100,3 +100,7 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 a) Detecting if people at home and check if all the equipment is switched off (iron / owen).
 b) Locating people inside the living area and do automation (turn on lights / music / tv)
 
+## Some fun
+|   |   |
+| :----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------:|
+| <img src="sample-images/pose-result3.png?sanitize=true&raw=true" /> | <img src="sample-images/pose-result4.png?sanitize=true&raw=true" /> |

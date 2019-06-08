@@ -11,31 +11,47 @@ import CoreML
 @testable import Pose
 
 class PoseTests: XCTestCase {
+    
+    var pose: PoseEstimation?
+    let estimationTimeout = 50.0
+    var testImage: UIImage?
 
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
+        testImage = UIImage(named: "sample-pose1-resized", in: Bundle(for: PoseTests.self), compatibleWith: nil)
     }
 
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
+    
+    func testPoseEstimation() {
+        guard let testImage = testImage else {
+            assertionFailure("A test image is not set")
+            return
+        }
+
+        let estimationCompleted = XCTestExpectation(description: "Pose estimation has completed")
+        pose?.estimate(on: testImage) { humans in
+            XCTAssertEqual(1, humans.count, "Incorrect amount of poses")
+            XCTAssertEqual(14, humans[0]?.count, "Incorrect amount of pose parts")
+            estimationCompleted.fulfill()
+        }
+        wait(for: [estimationCompleted], timeout: estimationTimeout)
+    }
 
     func testStride() {
-//        guard let testImage = UIImage(named: "sample-pose", in: Bundle(for: PoseTests.self), compatibleWith: nil) else {
-//            assertionFailure("Failed to open image")
-//            return
-//        }
-//
         let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
-        pose.stride_testable(x1: 0, y1: 0, x2: 4, y2: 0) { (x, y, idx, stepCount) in
-            XCTAssertEqual(stepCount, 5, "The number of steps is incorrect")
+        let strideResult = [[0, 0, 4, 0, 5], [0, 0, -4, 0, 5], [0, 0, -4, -4, 5],
+        [-4, -4, 0, 0, 5], [0, -4, 0, 0, 5], [0, -4, 0, 0, 5],
+        [0, 0, 4, 2, 5], [0, 0, -4, -2, 5], [0, 0, -2, -4, 5]]
+        strideResult.forEach { a in
+            pose.stride_testable(x1: a[0], y1: a[1], x2: a[2], y2: a[3]) { (x, y, idx, stepCount) in
+                XCTAssertEqual(stepCount, a[4], "The number of steps is incorrect")
+                XCTAssert(x == a[0] && y == a[1] && idx == 0, "x or y is not correct for index \(idx)")
+                XCTAssert(x == a[2] && y == a[3] && idx == stepCount - 1, "x or y is not correct for index \(idx)")
+            }
         }
-//        let estimationCompleted = XCTestExpectation(description: "Pose estimation has completed")
-//        pose.estimate(on: testImage) { humans in
-//            print(humans)
-//            estimationCompleted.fulfill()
-//        }
-//        wait(for: [estimationCompleted], timeout: 50.0)
     }
 
     func testPerformanceExample() {

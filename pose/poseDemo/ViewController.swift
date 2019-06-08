@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     
     private let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
     private lazy var testImage: UIImage  = {
-        guard let testImage = UIImage(named: "sample-pose3-resized", in: Bundle(for: ViewController.self), compatibleWith: nil) else {
+        guard let testImage = UIImage(named: "sample-pose1-resized", in: Bundle(for: ViewController.self), compatibleWith: nil) else {
             assertionFailure("Failed to open image")
             return UIImage()
         }
