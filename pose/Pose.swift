@@ -107,7 +107,7 @@ open class PoseEstimation {
         
         let threshold = Float32(modelConfig.outputWidh * modelConfig.outputHeight).squareRoot() / 150
         if vectorAToBLength < threshold {
-            return modelConfig.defaultNmsThreshold + 1e-6
+            return 0.15
         }
         
         return -1
@@ -183,14 +183,14 @@ extension PoseEstimation {
                     // Filter the heatmapp network output by applying a threshold
                     let heatMapArray = heatMatPtr.array(index: 0, count: heatMatCount * layerStride)
                     let avg = heatMapArray.reduce(0, +) / Float32(heatMapArray.count)
-                    let NMS_Threshold: Float32 = 0.1
-                    var _NMS_Threshold = max(avg * 4.0, NMS_Threshold)
-                    _NMS_Threshold = min(_NMS_Threshold, 0.3)
+                    var nmsThreshold: Float32 = self.modelConfig.minNmsThreshold
+                    nmsThreshold = max(avg * 4.0, nmsThreshold)
+                    nmsThreshold = min(nmsThreshold, self.modelConfig.maxNmsThreshold)
                     self.heatMapCandidates = []
                     for layerIndex in 0..<heatMatCount {
                         let layerPtr = heatMatPtr.advanced(by: layerIndex * layerStride)
                         for idx in 0..<layerStride {
-                            if layerPtr[idx] > _NMS_Threshold {
+                            if layerPtr[idx] > nmsThreshold {
                                 let col = idx % modelOutputWidth
                                 let row = idx / modelOutputWidth
                                 self.heatMapCandidates.append(HeatMapJointCandidate(col: col,
@@ -206,13 +206,16 @@ extension PoseEstimation {
                         let candidates = self.heatMapCandidates.filter { $0.layerIndex == layerIndex }
                         // Non maximum suppression to get as minimum candidates as possible
                         let boxes = candidates.map { c -> BoundingBox in
-                            let windowOrigin = CGPoint(x: max(0, c.col - 2), y: max(0, c.row - 2))
-                            let windowSize = CGSize(width: 5, height: 5)
+                            let originOffset = self.modelConfig.nmsWindowSize / 2
+                            let windowOrigin = CGPoint(x: max(0, c.col - originOffset),
+                                                       y: max(0, c.row - originOffset))
+                            let windowSize = CGSize(width: self.modelConfig.nmsWindowSize,
+                                                    height: self.modelConfig.nmsWindowSize)
                             return BoundingBox(classIndex: 0,
                                                score: Float(c.confidence),
                                                rect: CGRect(origin: windowOrigin, size: windowSize))
                         }
-                        let boxIndices = nonMaxSuppression(boundingBoxes: boxes, iouThreshold: 0.3, maxBoxes: boxes.count)
+                        let boxIndices = nonMaxSuppression(boundingBoxes: boxes, iouThreshold: 0.01, maxBoxes: boxes.count)
                         self.filteredHeatMapCandidates += boxIndices.map { candidates[$0] }
                     }
                     

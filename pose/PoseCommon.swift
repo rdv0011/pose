@@ -68,7 +68,9 @@ public protocol PoseModelConfiguration {
     var jointConnectionsCount: Int { get }
     var interMinAboveThreshold: Float32 { get }
     var interThreshold: Float32 { get }
-    var defaultNmsThreshold: Float32 { get }
+    var minNmsThreshold: Float32 { get }
+    var maxNmsThreshold: Float32 { get }
+    var nmsWindowSize: Int { get }
 }
 
 public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
@@ -97,7 +99,9 @@ public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
     
     public var interMinAboveThreshold: Float32 = Float32(0.75)
     public var interThreshold: Float32 = Float32(0.01)
-    public var defaultNmsThreshold: Float32 = Float32(0.3) // for MPI with 4 stages that is a fast version
+    public var minNmsThreshold: Float32 = Float32(0.1) // for MPI with 4 stages that is a fast version
+    public var maxNmsThreshold: Float32 = Float32(0.3) // for MPI with 4 stages that is a fast version
+    public var nmsWindowSize: Int = 7
     
     var joints = BodyJoint.array
     var jointConnections = JointConnection.array
