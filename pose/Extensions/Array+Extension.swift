@@ -122,46 +122,51 @@ extension Array where Element == JointConnectionWithScore {
     /// Draws connections on a specified image
     /// The alpha is constant if specified or is dynamically calculated based on a confidence otherwise
     /// Draws joints also if drawJoint is true
-    func draw(width: Int, height: Int, lineWidth: CGFloat = 1,
+    func draw(lineWidth: CGFloat = 5,
+             drawJoint: Bool = false, alpha: CGFloat? = nil,
+             on image: UIImage) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: image.size)
+        return renderer.image { context in
+            image.draw(at: .zero)
+            self.draw(lineWidth: lineWidth,
+                         drawJoint: drawJoint,
+                         alpha: alpha,
+                         on: context.cgContext)
+        }
+    }
+    /// Draws connections with a specified cotext
+    /// The alpha is constant if specified or is dynamically calculated based on a confidence otherwise
+    /// Draws joints also if drawJoint is true
+    func draw(lineWidth: CGFloat = 5,
               drawJoint: Bool = false, alpha: CGFloat? = nil,
-              on image: UIImage) -> UIImage {
+              on context: CGContext) {
         
         let confidences: [Float] = self.map({ $0.score })
         guard let convertedValues = confidences.converted(from : confidences, highestValue: 0.7) else {
-            return UIImage()
+            return
         }
         
-        let renderer = UIGraphicsImageRenderer(size: image.size)
-        let kx = CGFloat(image.size.width) / CGFloat(width)
-        let ky = CGFloat(image.size.height) / CGFloat(height)
-        return renderer.image { context in
-            image.draw(at: .zero)
-            let radius = lineWidth
-            let (offsetX, offsetY) = (image.size.width / CGFloat(width) / 2,
-                                      image.size.height / CGFloat(height) / 2)
-            self.enumerated().forEach { idx, c in
-                context.cgContext.setStrokeColor(c.connection.color.cgColor)
-                context.cgContext.setAlpha(alpha ?? CGFloat(convertedValues[idx] + 0.3))
-                context.cgContext.setLineWidth(lineWidth)
-                context.cgContext.beginPath()
-                context.cgContext.move(to: CGPoint(x: CGFloat(c.joint1.x) * kx + offsetX,
-                                                   y: CGFloat(c.joint1.y) * ky + offsetY))
-                context.cgContext.addLine(to: CGPoint(x: CGFloat(c.joint2.x) * kx + offsetX,
-                                                      y: CGFloat(c.joint2.y) * ky + offsetY))
-                if drawJoint {
-                    let coords = [(c.joint1.x, c.joint1.y, c.connection.joints.0.color.cgColor),
-                                  (c.joint2.x, c.joint2.y, c.connection.joints.1.color.cgColor)]
-                    coords.forEach { i in
-                        let x = CGFloat(i.0) * kx + offsetX - radius
-                        let y = CGFloat(i.1) * ky + offsetY - radius
-                        context.cgContext.setStrokeColor(i.2)
-                        context.cgContext.addEllipse(in: CGRect(origin: CGPoint(x: x, y: y),
-                                                                size: CGSize(width: 2 * radius,
-                                                                             height: 2 * radius)))
-                    }
+        let radius = lineWidth
+        self.enumerated().forEach { idx, c in
+            context.setStrokeColor(c.connection.color.cgColor)
+            context.setAlpha(alpha ?? CGFloat(convertedValues[idx] + 0.3))
+            context.setLineWidth(lineWidth)
+            context.beginPath()
+            context.move(to: CGPoint(x: CGFloat(c.joint1.x), y: CGFloat(c.joint1.y)))
+            context.addLine(to: CGPoint(x: CGFloat(c.joint2.x), y: CGFloat(c.joint2.y)))
+            if drawJoint {
+                let coords = [(c.joint1.x, c.joint1.y, c.connection.joints.0.color.cgColor),
+                              (c.joint2.x, c.joint2.y, c.connection.joints.1.color.cgColor)]
+                coords.forEach { i in
+                    let x = CGFloat(i.0) - radius
+                    let y = CGFloat(i.1) - radius
+                    context.setStrokeColor(i.2)
+                    context.addEllipse(in: CGRect(origin: CGPoint(x: x, y: y),
+                                                            size: CGSize(width: 2 * radius,
+                                                                         height: 2 * radius)))
                 }
-                context.cgContext.strokePath()
             }
+            context.strokePath()
         }
     }
 }

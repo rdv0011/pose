@@ -6,10 +6,7 @@ protoFile = 'pose_deploy_linevec_faster_4_stages_fixed_size.prototxt'
 inputFilesBaseDir = '../../../models/pose/mpi/'
 coreml_model = coremltools.converters.caffe.convert((inputFilesBaseDir + caffeeModel, inputFilesBaseDir + protoFile),
 														image_input_names = 'image',
-														red_bias = -1,
-														green_bias = -1,
-														blue_bias = -1,
-														image_scale = 0.007843137718737125)
+														image_scale = 1.0/255)
 spec = coreml_model.get_spec()
 
 def _convert_multiarray_to_float32(feature):

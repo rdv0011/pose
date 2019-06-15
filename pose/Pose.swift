@@ -21,6 +21,8 @@ open class PoseEstimation {
     
     private var coremlProcessingStart = Date()
     private var coremlProcessingFinish = Date()
+    private var postProcessingStart = Date()
+    private var postProcessingFinish = Date()
     private let log = SwiftyBeaver.self
 
     public var keepDebugInfo: Bool = false
@@ -105,7 +107,7 @@ open class PoseEstimation {
             return sum / Float32(scoresCount)
         }
         
-        let threshold = Float32(modelConfig.outputWidh * modelConfig.outputHeight).squareRoot() / 150
+        let threshold = Float32(modelConfig.outputWidth * modelConfig.outputHeight).squareRoot() / 150
         if vectorAToBLength < threshold {
             return 0.15
         }
@@ -120,6 +122,16 @@ open class PoseEstimation {
             uiImage = image.resizedCentered(toSize: modelConfig.inputSize)
         }
         
+        var scaleFactor = image.size.height / CGFloat(modelConfig.outputHeight)
+        var offsetX = CGFloat.zero
+        var offsetY = CGFloat.zero
+        if image.size.width < image.size.height {
+            offsetX = 0.5 * (image.size.width - CGFloat(modelConfig.outputWidth) * scaleFactor)
+        } else {
+            scaleFactor = image.size.width / CGFloat(modelConfig.outputWidth)
+            offsetY = 0.5 * (image.size.height - CGFloat(modelConfig.outputHeight) * scaleFactor)
+        }
+        
         guard let ciImage = CIImage(image: uiImage) else {
             assertionFailure("Failed to create ciImage")
             completion([:])
@@ -127,7 +139,25 @@ open class PoseEstimation {
         }
         
         do {
-            let coremlRequest = try mlRequest(model: self.model, completion: completion)
+            let coremlRequest = try mlRequest(model: self.model) { connections in
+                // Scale coordinates of the output connections to be aligned with the input image size
+                self.humanConnections = connections.mapValues { connections in
+                    return connections.map {
+                        
+                        let joint1 = JointPoint(x: Int(CGFloat($0.joint1.x) * scaleFactor + offsetX),
+                                                y: Int(CGFloat($0.joint1.y) * scaleFactor + offsetY))
+                        let joint2 = JointPoint(x: Int(CGFloat($0.joint2.x) * scaleFactor + offsetX),
+                                                y: Int(CGFloat($0.joint2.y) * scaleFactor + offsetY))
+                        return JointConnectionWithScore(connection: $0.connection,
+                                                            score: $0.score,
+                                                            offsetJoint1: $0.offsetJoint1,
+                                                            offsetJoint2: $0.offsetJoint2,
+                                                            joint1: joint1,
+                                                            joint2: joint2)
+                    }
+                }
+                completion(self.humanConnections)
+            }
             // Set an image scaling mode for the Vision framework
             coremlRequest.imageCropAndScaleOption = .centerCrop
             // Even though the CoreML model has fixed input image size that is not equal to the real input image the Vision framework will scale it accordingly
@@ -135,6 +165,7 @@ open class PoseEstimation {
             DispatchQueue.global(qos: .userInteractive).async {
                 do {
                     self.coremlProcessingStart = Date()
+                    self.resetOutput()
                     try handler.perform([coremlRequest])
                 } catch {
                     self.log.error(error)
@@ -162,12 +193,14 @@ extension PoseEstimation {
             }
             let multiArray = observations.first!.featureValue.multiArrayValue
             let layersCount = self.modelConfig.layersCount
-            let modelOutputWidth = self.modelConfig.outputWidh
+            let modelOutputWidth = self.modelConfig.outputWidth
             let modelOutputHeight = self.modelConfig.outputHeight
             let backgroundLayerIndex = self.modelConfig.backgroundLayerIndex
             let pafLayerStartIndex = self.modelConfig.pafLayerStartIndex
             
             withExtendedLifetime(multiArray) {
+                
+                self.postProcessingStart = Date()
                 
                 let reshapedArray = try? multiArray?.reshaped(to: [layersCount, modelOutputWidth, modelOutputHeight])
                 if let reshapedArray = reshapedArray {
@@ -298,6 +331,8 @@ extension PoseEstimation {
                             self.humanConnections[humanJoints.count - 1] = [c]
                         }
                     }
+                    
+                    self.postProcessingFinish = Date()
                     completion(self.humanConnections)
                 } else {
                     self.log.debug("Failed to re-shape a multy array \(String(describing: multiArray))")
@@ -310,8 +345,16 @@ extension PoseEstimation {
 
 extension PoseEstimation {
     
+    private func resetOutput() {
+        self.networkOutput = []
+        self.heatMapCandidates = []
+        self.filteredHeatMapCandidates = []
+        self.allConnectionCandidates = []
+        self.humanConnections = [:]
+    }
+    
     private var modelOutputLayerStride: Int {
-        return self.modelConfig.outputWidh * self.modelConfig.outputHeight
+        return self.modelConfig.outputWidth * self.modelConfig.outputHeight
     }
     
     public var coreMLProcessingTime: String {
@@ -319,11 +362,16 @@ extension PoseEstimation {
         return String(format: "%d", Int(timeElapsed * 1000))
     }
     
+    public var postProcessingTime: String {
+        let timeElapsed = postProcessingFinish.timeIntervalSince(postProcessingStart)
+        return String(format: "%d", Int(timeElapsed * 1000))
+    }
+    
     public func heatMapLayersCombined(completion: @escaping ((UIImage)->())) {
         let heatMatCount = modelConfig.backgroundLayerIndex
         DispatchQueue.global(qos: .userInteractive).async {
             completion(self.networkOutput.drawMatricesCombined(matricesCount: heatMatCount,
-                                                      width: self.modelConfig.outputWidh,
+                                                               width: self.modelConfig.outputWidth,
                                                       height: self.modelConfig.outputHeight,
                                                       colors: Pose.colors).resized(to: self.modelConfig.inputSize))
         }
@@ -336,7 +384,7 @@ extension PoseEstimation {
             return
         }
         
-        let modelOutputWidth = modelConfig.outputWidh
+        let modelOutputWidth = modelConfig.outputWidth
         let modelOutputHeight = modelConfig.outputHeight
         let backgroundLayer = Array(networkOutput.slice(blockIndex: modelConfig.backgroundLayerIndex,
                                                   blockSize: modelOutputLayerStride))
@@ -356,7 +404,7 @@ extension PoseEstimation {
     public func filteredHeatMapCandidatesImage(completion: @escaping ((UIImage)->())) {
         DispatchQueue.global(qos: .userInteractive).async {
             // Draw joint candidates after second round filtering
-            completion(self.filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidh,
+            completion(self.filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidth,
                                                   height: self.modelConfig.outputHeight,
                                                   radius: 3.0,
                                                   lineWidth: 6.0,
@@ -367,12 +415,10 @@ extension PoseEstimation {
     public func jointsWithConnectionsImage(completion: @escaping ((UIImage)->())) {
         DispatchQueue.global(qos: .userInteractive).async {
             // Draw all connecions using a score as an alpha
-            let allConnectionsImage = self.allConnectionCandidates.draw(width: self.modelConfig.outputWidh,
-                                                                   height: self.modelConfig.outputHeight,
-                                                                   lineWidth: 5,
+            let allConnectionsImage = self.allConnectionCandidates.draw(lineWidth: 5,
                                                                    on: UIImage.image(with: .white, size: self.modelConfig.inputSize))
             // Draw filtered joints over the all connection candidates
-            completion(self.filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidh,
+            completion(self.filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidth,
                                         height: self.modelConfig.outputHeight,
                                         radius: 5,
                                         lineWidth: 3,
@@ -387,7 +433,7 @@ extension PoseEstimation {
             return
         }
         DispatchQueue.global(qos: .userInteractive).async {
-            let modelOutputWidth = self.modelConfig.outputWidh
+            let modelOutputWidth = self.modelConfig.outputWidth
             let modelOutputHeight = self.modelConfig.outputHeight
             let pafLayerStartIndex = self.modelConfig.pafLayerStartIndex
             let modelInputSize = self.modelConfig.inputSize
@@ -468,13 +514,9 @@ extension PoseEstimation {
                                                                       radius: 7,
                                                                       lineWidth: 3,
                                                                       on: pafYJointsConnectionsImage)
-                resultImages.append(jointConns.draw(width: modelOutputWidth,
-                                                    height: modelOutputHeight,
-                                                    lineWidth: 3,
+                resultImages.append(jointConns.draw(lineWidth: 3,
                                                     on: pafXJointsConnectionsImage))
-                resultImages.append(jointConns.draw(width: modelOutputWidth,
-                                                    height: modelOutputHeight,
-                                                    lineWidth: 3,
+                resultImages.append(jointConns.draw(lineWidth: 3,
                                                     on: pafYJointsConnectionsImage))
             }
             completion(resultImages)
@@ -490,13 +532,15 @@ extension PoseEstimation {
         // Draws human joints and connections over an input image
         DispatchQueue.global(qos: .userInteractive).async {
             var resultImage = overImage.grayed
-            self.humanConnections.forEach { h in
-                resultImage = h.value.draw(width: self.modelConfig.outputWidh,
-                                           height: self.modelConfig.outputHeight,
-                                           lineWidth: 3,
-                                           drawJoint: true,
-                                           alpha: 1.0,
-                                           on: resultImage)
+            let renderer = UIGraphicsImageRenderer(size: resultImage.size)
+            resultImage = renderer.image { context in
+                resultImage.draw(at: .zero)
+                self.humanConnections.forEach { h in
+                    h.value.draw(lineWidth: max(overImage.size.width / 100, 1.0),
+                                   drawJoint: true,
+                                   alpha: 1.0,
+                                   on: context.cgContext)
+                }
             }
             completion(resultImage)
         }
@@ -509,7 +553,7 @@ extension PoseEstimation {
             return
         }
         let layersCount = self.modelConfig.layersCount
-        let modelOutputWidth = self.modelConfig.outputWidh
+        let modelOutputWidth = self.modelConfig.outputWidth
         let modelOutputHeight = self.modelConfig.outputHeight
         let pafLayerStartIndex = self.modelConfig.pafLayerStartIndex
         let modelOutputLayerStride = self.modelOutputLayerStride

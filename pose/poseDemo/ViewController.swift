@@ -17,21 +17,23 @@ class ViewController: UIViewController {
     @IBOutlet weak var viewCollectionFlow: UICollectionViewFlowLayout!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     private let log = SwiftyBeaver.self
+    private lazy var imagePicker = {
+        return UIImagePickerController()
+    }()
     
     private let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
-    private lazy var testImage: UIImage  = {
-        guard let testImage = UIImage(named: "sample-pose3-resized", in: Bundle(for: ViewController.self), compatibleWith: nil) else {
-            assertionFailure("Failed to open image")
-            return UIImage()
-        }
-        return testImage
-    }()
+    private var testImage: UIImage?
     
     private static var joitConnectionCombinedImagesCount: Int {
         let pose = PoseModelConfigurationMPI15()
         return pose.jointConnectionsCount * 4
     }
-    private var imageCount = 0
+    private var imageCount = 0 {
+        didSet {
+            self.imageCache = Array(repeating: nil, count: ViewController.totalImagesCount)
+            self.viewCollection.reloadData()
+        }
+    }
     private static let totalImagesCount = 5 + ViewController.joitConnectionCombinedImagesCount
     private var imageCache: [UIImage?] = Array(repeating: nil, count: ViewController.totalImagesCount)
     private var jointsWithConnectionsByLayersProcesing = false
@@ -39,23 +41,47 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         pose.keepDebugInfo = true
-        estimatePose()
     }
     
-    private func estimatePose() {
+    @IBAction func chooseImageClicked(_ sender: UIButton) {
+        imagePicker.delegate = self
+        if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum) {
+            imagePicker.sourceType = .savedPhotosAlbum
+            imagePicker.allowsEditing = false
+            self.present(imagePicker, animated: true, completion: nil)
+        }
+    }
+    
+    private func estimatePose(on image: UIImage) {
         imageCount = 0
         activityIndicator.startAnimating()
-        pose.estimate(on: testImage) { humans in
+        pose.estimate(on: image) { humans in
             DispatchQueue.main.async {
                 self.log.debug("CoreML processing time \(self.pose.coreMLProcessingTime) ms")
+                self.log.debug("Post processing time \(self.pose.postProcessingTime) ms")
                 self.imageCount = ViewController.totalImagesCount
                 self.activityIndicator.stopAnimating()
-                self.viewCollection.reloadData()
             }
         }
     }
 
 
+}
+
+extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        guard let chosenImage = info[.originalImage] as? UIImage else {
+            return
+        }
+        self.testImage = chosenImage
+        estimatePose(on: chosenImage)
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
 }
 
 extension ViewController: UICollectionViewDelegate {
@@ -112,6 +138,10 @@ extension ViewController: UICollectionViewDataSource {
 
 extension ViewController {
     func imageFor(row: Int, completion: @escaping ((UIImage)->())) {
+        guard let testImage = testImage else {
+            return
+        }
+        
         if let image = imageCache[row] {
             completion(image)
             return
