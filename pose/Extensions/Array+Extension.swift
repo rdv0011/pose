@@ -87,16 +87,12 @@ extension Array where Element == HeatMapJointCandidate {
     /// Draws heat map candidates on a specified image
     /// If alpha specified then it will be used or an alpha is calculated dynamically based on a heat map candidate's confidence
     /// The lineWidth varies based on the candidate's confidence
-    func draw(width: Int, height: Int, alpha: CGFloat? = nil,
-              radius: CGFloat = 3, lineWidth: CGFloat = 1, on image: UIImage) -> UIImage {
+    func draw(alpha: CGFloat? = nil, radius: CGFloat = 3,
+              lineWidth: CGFloat = 1, offset: CGFloat = 4, on image: UIImage) -> UIImage {
         let confidences: [Float] = self.map({ $0.confidence })
         guard let convertedValues = confidences.converted(from : confidences, highestValue: 0.7) else {
             return UIImage()
         }
-        let kx = CGFloat(image.size.width) / CGFloat(width)
-        let ky = CGFloat(image.size.height) / CGFloat(height)
-        let (offsetX, offsetY) = (image.size.width / CGFloat(width) / 2,
-                                  image.size.height / CGFloat(height) / 2)
         let renderer = UIGraphicsImageRenderer(size: image.size)
         
         return renderer.image { context in
@@ -106,8 +102,8 @@ extension Array where Element == HeatMapJointCandidate {
                 context.cgContext.setStrokeColor(c.color.cgColor)
                 context.cgContext.setAlpha(alpha ?? CGFloat(convertedValues[idx] + 0.3))
                 context.cgContext.beginPath()
-                let x = CGFloat(c.col) * kx + offsetX - radius
-                let y = CGFloat(c.row) * ky + offsetY - radius
+                let x = CGFloat(c.col) - radius + offset
+                let y = CGFloat(c.row) - radius + offset
                 context.cgContext.addEllipse(in: CGRect(origin: CGPoint(x: x, y: y),
                                                         size: CGSize(width: 2 * radius,
                                                                      height: 2 * radius)))
@@ -123,14 +119,14 @@ extension Array where Element == JointConnectionWithScore {
     /// The alpha is constant if specified or is dynamically calculated based on a confidence otherwise
     /// Draws joints also if drawJoint is true
     func draw(lineWidth: CGFloat = 5,
-             drawJoint: Bool = false, alpha: CGFloat? = nil,
+             drawJoint: Bool = false, alpha: CGFloat? = nil, offset: CGFloat = 4,
              on image: UIImage) -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: image.size)
         return renderer.image { context in
             image.draw(at: .zero)
             self.draw(lineWidth: lineWidth,
                          drawJoint: drawJoint,
-                         alpha: alpha,
+                         alpha: alpha, offset: offset,
                          on: context.cgContext)
         }
     }
@@ -138,7 +134,7 @@ extension Array where Element == JointConnectionWithScore {
     /// The alpha is constant if specified or is dynamically calculated based on a confidence otherwise
     /// Draws joints also if drawJoint is true
     func draw(lineWidth: CGFloat = 5,
-              drawJoint: Bool = false, alpha: CGFloat? = nil,
+              drawJoint: Bool = false, alpha: CGFloat? = nil, offset: CGFloat = 4,
               on context: CGContext) {
         
         let confidences: [Float] = self.map({ $0.score })
@@ -152,14 +148,16 @@ extension Array where Element == JointConnectionWithScore {
             context.setAlpha(alpha ?? CGFloat(convertedValues[idx] + 0.3))
             context.setLineWidth(lineWidth)
             context.beginPath()
-            context.move(to: CGPoint(x: CGFloat(c.joint1.x), y: CGFloat(c.joint1.y)))
-            context.addLine(to: CGPoint(x: CGFloat(c.joint2.x), y: CGFloat(c.joint2.y)))
+            context.move(to: CGPoint(x: CGFloat(c.joint1.x) + offset,
+                                     y: CGFloat(c.joint1.y) + offset))
+            context.addLine(to: CGPoint(x: CGFloat(c.joint2.x) + offset,
+                                        y: CGFloat(c.joint2.y) + offset))
             if drawJoint {
                 let coords = [(c.joint1.x, c.joint1.y, c.connection.joints.0.color.cgColor),
                               (c.joint2.x, c.joint2.y, c.connection.joints.1.color.cgColor)]
                 coords.forEach { i in
-                    let x = CGFloat(i.0) - radius
-                    let y = CGFloat(i.1) - radius
+                    let x = CGFloat(i.0) - radius + offset
+                    let y = CGFloat(i.1) - radius + offset
                     context.setStrokeColor(i.2)
                     context.addEllipse(in: CGRect(origin: CGPoint(x: x, y: y),
                                                             size: CGSize(width: 2 * radius,

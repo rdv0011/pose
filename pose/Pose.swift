@@ -343,6 +343,24 @@ extension PoseEstimation {
     }
 }
 
+extension HeatMapJointCandidate {
+    func scaled(kx: CGFloat, ky: CGFloat) -> HeatMapJointCandidate {
+        return HeatMapJointCandidate(col: Int(CGFloat(self.col) * kx), row: Int(CGFloat(self.row) * kx),
+                                     layerIndex: self.layerIndex, confidence: self.confidence)
+    }
+}
+
+extension JointConnectionWithScore {
+    func scaled(kx: CGFloat, ky: CGFloat) -> JointConnectionWithScore {
+        return JointConnectionWithScore(connection: self.connection , score: self.score,
+                                        offsetJoint1: self.offsetJoint1, offsetJoint2: self.offsetJoint2,
+                                        joint1: JointPoint(x: Int(kx * CGFloat(self.joint1.x)),
+                                                           y: Int(ky * CGFloat(self.joint1.y))),
+                                        joint2: JointPoint(x: Int(kx * CGFloat(self.joint2.x)),
+                                                           y: Int(ky * CGFloat(self.joint2.y))))
+    }
+}
+
 extension PoseEstimation {
     
     private func resetOutput() {
@@ -393,22 +411,23 @@ extension PoseEstimation {
             // Use alpha to indicate candiates confidence
             let resizedBackgroundLayer = backgroundLayer.draw(width: modelOutputWidth,
                                                               height: modelOutputHeight).resized(to: self.modelConfig.inputSize)
-            completion(self.heatMapCandidates.draw(width: modelOutputWidth,
-                                          height: modelOutputHeight,
-                                          radius: 3.0,
-                                          lineWidth: 2.0,
-                                          on: resizedBackgroundLayer))
+            let kx = CGFloat(self.modelConfig.inputSize.width) / CGFloat(modelOutputWidth)
+            let ky = CGFloat(self.modelConfig.inputSize.height) / CGFloat(modelOutputHeight)
+            let candidates = self.heatMapCandidates.map { $0.scaled(kx: kx, ky: ky) }
+            completion(candidates.draw(radius: 3.0, lineWidth: 2.0, on: resizedBackgroundLayer))
         }
     }
     
     public func filteredHeatMapCandidatesImage(completion: @escaping ((UIImage)->())) {
         DispatchQueue.global(qos: .userInteractive).async {
+            let modelOutputWidth = self.modelConfig.outputWidth
+            let modelOutputHeight = self.modelConfig.outputHeight
+            let kx = CGFloat(self.modelConfig.inputSize.width) / CGFloat(modelOutputWidth)
+            let ky = CGFloat(self.modelConfig.inputSize.height) / CGFloat(modelOutputHeight)
+            let candidates = self.filteredHeatMapCandidates.map { $0.scaled(kx: kx, ky: ky) }
             // Draw joint candidates after second round filtering
-            completion(self.filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidth,
-                                                  height: self.modelConfig.outputHeight,
-                                                  radius: 3.0,
-                                                  lineWidth: 6.0,
-                                                  on: UIImage.image(with: .white, size: self.modelConfig.inputSize)))
+            completion(candidates.draw(radius: 3.0, lineWidth: 6.0,
+                                       on: UIImage.image(with: .white, size: self.modelConfig.inputSize)))
         }
     }
     
@@ -418,10 +437,7 @@ extension PoseEstimation {
             let allConnectionsImage = self.allConnectionCandidates.draw(lineWidth: 5,
                                                                    on: UIImage.image(with: .white, size: self.modelConfig.inputSize))
             // Draw filtered joints over the all connection candidates
-            completion(self.filteredHeatMapCandidates.draw(width: self.modelConfig.outputWidth,
-                                        height: self.modelConfig.outputHeight,
-                                        radius: 5,
-                                        lineWidth: 3,
+            completion(self.filteredHeatMapCandidates.draw( radius: 5, lineWidth: 3,
                                         on: allConnectionsImage))
         }
     }
@@ -445,15 +461,17 @@ extension PoseEstimation {
                                                        blockSize: self.modelOutputLayerStride))
                 let pafMatY = Array(self.networkOutput.slice(blockIndex: pafLayerStartIndex + indexY,
                                                        blockSize: self.modelOutputLayerStride))
-                let pafXImage = pafMatX.draw(width: modelOutputWidth, height: modelOutputHeight)
-                let pafYImage = pafMatY.draw(width: modelOutputWidth, height: modelOutputHeight)
+                let pafXImage = pafMatX.draw(width: modelOutputWidth,
+                                             height: modelOutputHeight).resized(to: modelInputSize)
+                let pafYImage = pafMatY.draw(width: modelOutputWidth,
+                                             height: modelOutputHeight).resized(to: modelInputSize)
                 
-                // Two joints one connection
-                let joints1 = self.heatMapCandidates.filter({ $0.layerIndex == connection.joints.0.index()})
-                let joints2 = self.heatMapCandidates.filter({ $0.layerIndex == connection.joints.1.index()})
-                let filteredJoints1 = self.filteredHeatMapCandidates.filter({ $0.layerIndex == connection.joints.0.index()})
-                let filteredJoints2 = self.filteredHeatMapCandidates.filter({ $0.layerIndex == connection.joints.1.index()})
-                let jointConns = self.allConnectionCandidates.filter({ $0.connection == connection })
+                // Two joints one connection in between
+                var joints1 = self.heatMapCandidates.filter({ $0.layerIndex == connection.joints.0.index()})
+                var joints2 = self.heatMapCandidates.filter({ $0.layerIndex == connection.joints.1.index()})
+                var filteredJoints1 = self.filteredHeatMapCandidates.filter({ $0.layerIndex == connection.joints.0.index()})
+                var filteredJoints2 = self.filteredHeatMapCandidates.filter({ $0.layerIndex == connection.joints.1.index()})
+                var jointConns = self.allConnectionCandidates.filter({ $0.connection == connection })
                 
                 // The index of joint is equal to a heatmap index
                 let (heatMapIndex1, heatMapIndex2) = (connection.joints.0.index(), connection.joints.1.index())
@@ -463,60 +481,47 @@ extension PoseEstimation {
                                                         blockSize: self.modelOutputLayerStride))
                 let heatMap2 = Array(self.networkOutput.slice(blockIndex: heatMapIndex2,
                                                         blockSize: self.modelOutputLayerStride))
-                var heatMap1Image = heatMap1.draw(width: modelOutputWidth, height: modelOutputHeight)
-                var heatMap2Image = heatMap2.draw(width: modelOutputWidth, height: modelOutputHeight)
+                var heatMap1Image = heatMap1.draw(width: modelOutputWidth,
+                                                  height: modelOutputHeight).resized(to: modelInputSize)
+                var heatMap2Image = heatMap2.draw(width: modelOutputWidth,
+                                                  height: modelOutputHeight).resized(to: modelInputSize)
+                
+                let jointRadius = CGFloat(Int(modelInputSize.width) / modelOutputWidth / 2)
+                let connectionWidth = jointRadius * 0.8
+                
+                // NN output has a reduced size comparing to the input
+                // Although for a good visual experience it is better to enlarge the size
+                // To do this let's scale the heatmap and PAF`s output coordinates
+                let kx = CGFloat(self.modelConfig.inputSize.width) / CGFloat(modelOutputWidth)
+                let ky = CGFloat(self.modelConfig.inputSize.height) / CGFloat(modelOutputHeight)
+                joints1 = joints1.map { $0.scaled(kx: kx, ky: ky) }
+                joints2 = joints2.map { $0.scaled(kx: kx, ky: ky) }
+                filteredJoints1 = filteredJoints1.map { $0.scaled(kx: kx, ky: ky) }
+                filteredJoints2 = filteredJoints2.map { $0.scaled(kx: kx, ky: ky) }
+                jointConns = jointConns.map { $0.scaled(kx: kx, ky: ky) }
                 
                 // Draw joint candidates on the heat map layers
-                heatMap1Image = filteredJoints1.draw(width: modelOutputWidth,
-                                                     height: modelOutputHeight,
-                                                     alpha: 1.0,
-                                                     radius: 5,
-                                                     lineWidth: 3,
-                                                     on: heatMap1Image.resized(to: modelInputSize))
-                resultImages.append(joints1.draw(width: modelOutputWidth,
-                                                 height: modelOutputHeight,
-                                                 radius: 5,
-                                                 lineWidth: 0.5,
+                heatMap1Image = filteredJoints1.draw(alpha: 1.0, radius: 2, lineWidth: 2,
+                                                     on: heatMap1Image)
+                resultImages.append(joints1.draw(radius: jointRadius, lineWidth: 1,
                                                  on: heatMap1Image))
-                heatMap2Image = filteredJoints2.draw(width: modelOutputWidth,
-                                                     height: modelOutputHeight,
-                                                     alpha: 1.0,
-                                                     radius: 5,
-                                                     lineWidth: 3,
-                                                     on: heatMap2Image.resized(to: modelInputSize))
-                resultImages.append(joints2.draw(width: modelOutputWidth,
-                                                 height: modelOutputHeight,
-                                                 radius: 5,
-                                                 lineWidth: 0.5,
+                heatMap2Image = filteredJoints2.draw(alpha: 1.0, radius: 2, lineWidth: 2,
+                                                     on: heatMap2Image)
+                resultImages.append(joints2.draw(radius: jointRadius, lineWidth: 1,
                                                  on: heatMap2Image))
+                
                 // Draw joint candidates and connections on the PAFs layers
-                var pafXJointsConnectionsImage = filteredJoints1.draw(width: modelOutputWidth,
-                                                         height: modelOutputHeight,
-                                                         alpha: 1.0,
-                                                         radius: 7,
-                                                         lineWidth: 3,
-                                                         on: pafXImage.resized(to: modelInputSize))
-                pafXJointsConnectionsImage = filteredJoints2.draw(width: modelOutputWidth,
-                                                                      height: modelOutputHeight,
-                                                                      alpha: 1.0,
-                                                                      radius: 7,
-                                                                      lineWidth: 3,
-                                                                      on: pafXJointsConnectionsImage)
-                var pafYJointsConnectionsImage = filteredJoints1.draw(width: modelOutputWidth,
-                                                         height: modelOutputHeight,
-                                                         alpha: 1.0,
-                                                         radius: 7,
-                                                         lineWidth: 3,
-                                                         on: pafYImage.resized(to: modelInputSize))
-                pafYJointsConnectionsImage = filteredJoints2.draw(width: modelOutputWidth,
-                                                                      height: modelOutputHeight,
-                                                                      alpha: 1.0,
-                                                                      radius: 7,
-                                                                      lineWidth: 3,
-                                                                      on: pafYJointsConnectionsImage)
-                resultImages.append(jointConns.draw(lineWidth: 3,
+                var pafXJointsConnectionsImage = filteredJoints1.draw(alpha: 1.0, radius: 2 * jointRadius, lineWidth: 3,
+                                                                      on: pafXImage)
+                pafXJointsConnectionsImage = filteredJoints2.draw(alpha: 1.0, radius: 2 * jointRadius, lineWidth: 3,
+                                                                  on: pafXJointsConnectionsImage)
+                var pafYJointsConnectionsImage = filteredJoints1.draw(alpha: 1.0, radius: 2 * jointRadius, lineWidth: 3,
+                                                                      on: pafYImage)
+                pafYJointsConnectionsImage = filteredJoints2.draw(alpha: 1.0, radius: 2 * jointRadius, lineWidth: 3,
+                                                                  on: pafYJointsConnectionsImage)
+                resultImages.append(jointConns.draw(lineWidth: 2 * connectionWidth,
                                                     on: pafXJointsConnectionsImage))
-                resultImages.append(jointConns.draw(lineWidth: 3,
+                resultImages.append(jointConns.draw(lineWidth: 2 * connectionWidth,
                                                     on: pafYJointsConnectionsImage))
             }
             completion(resultImages)

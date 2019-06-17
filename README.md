@@ -104,3 +104,4 @@ b) Locating people inside the living area and do automation (turn on lights / mu
 |   |   |
 | :----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------:|
 | <img src="sample-images/pose-result3.png?sanitize=true&raw=true" /> | <img src="sample-images/pose-result4.png?sanitize=true&raw=true" /> |
+| <img src="sample-images/pose-result5.png?sanitize=true&raw=true" /> |  |
