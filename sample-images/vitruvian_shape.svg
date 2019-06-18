@@ -354,15 +354,15 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="344.29014"
-     inkscape:cy="1101.3272"
+     inkscape:zoom="0.61546204"
+     inkscape:cx="413.32067"
+     inkscape:cy="542.48459"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1440"
      inkscape:window-height="808"
-     inkscape:window-x="-2"
+     inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      showguides="true"
@@ -681,12 +681,17 @@
          sodipodi:role="line"
          x="106.63058"
          y="40.139183"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:8.46666622px;line-height:0.5;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue Bold';text-align:center;text-anchor:middle;stroke-width:0.26458332">Shape model MPII</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:8.46666622px;line-height:0.5;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue Bold';text-align:center;text-anchor:middle;stroke-width:0.26458332">Human pose model MPII</tspan><tspan
          sodipodi:role="line"
          x="106.63058"
          y="45.430851"
          style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-size:4.93888903px;line-height:0.5;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue Light Italic';text-align:center;text-anchor:middle;stroke-width:0.26458332"
-         id="tspan936">expressive 3D human body shape model</tspan></text>
+         id="tspan936">articulated human pose estimation https://pose.mpi-inf.mpg.de/</tspan><tspan
+         sodipodi:role="line"
+         x="106.63058"
+         y="50.785622"
+         style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-size:4.93888903px;line-height:0.5;font-family:'Helvetica Neue';-inkscape-font-specification:'Helvetica Neue Light Italic';text-align:center;text-anchor:middle;stroke-width:0.26458332"
+         id="tspan978" /></text>
     <image
        y="51.003399"
        x="105.59631"
@@ -807,5 +812,16 @@
        preserveAspectRatio="none"
        height="5.2049546"
        width="5.2049546" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="209.78819"
+       y="92.80043"
+       id="text982"><tspan
+         sodipodi:role="line"
+         id="tspan980"
+         x="209.78819"
+         y="102.1642"
+         style="stroke-width:0.26458332" /></text>
   </g>
 </svg>
