@@ -1,5 +1,5 @@
 # Human Pose estimation
-This framework helps to estimate the human pose on an image. The parts of the human body used in this project are shown on the following image:
+This framework estimates the human pose on an image. The parts of the human body used in this project are shown on the following image:
 
 <img src="sample-images/vitruvian_shape.png?sanitize=true&raw=true" />
 
@@ -113,5 +113,5 @@ All numbers shown above could vary for each particular run.
 ## Some fun
 |   |   |
 | :----------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------:|
-| <img src="sample-images/pose-result3.png?sanitize=true&raw=true" /> | <img src="sample-images/pose-result4.png?sanitize=true&raw=true" /> |
+|The image was taken from [Magic Poser](https://magicposer.com) <br/> <img src="sample-images/pose-result3.png?sanitize=true&raw=true" />| <img src="sample-images/pose-result4.png?sanitize=true&raw=true" /> |
 | <img src="sample-images/pose-result5.png?sanitize=true&raw=true" /> |  |
