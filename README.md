@@ -79,8 +79,15 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 
 |   NN input size    | iPhone XR (ms)   | iPhone 8 (ms) | iPhone 5S (ms) |
 |:-------------------:|:-------------------:|:-----------------:|:------------------:|
+|      CoreML       |
 |      512 x 512       |          210            |      3670          |        20801        |
 |      256 x 256       |          100            |       868           |         7162         |
+|      Post-processing       |
+|      512 x 512       |                      |                |        100        |
+|      256 x 256       |                      |                  |                  |
+|      Total       |
+|      512 x 512       |                      |                |        100        |
+|      256 x 256       |                      |                  |                  |
 
 ### The result pose depending on the NN input size (the smaller and faster the less accurate result is)
 |      512 x 512       |    256 x 256       |
