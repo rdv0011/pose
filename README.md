@@ -1,5 +1,5 @@
 # Human Pose estimation
-This framework helps to estimate the human pose on an image. The parts of the human body used in this project are shown on the follwoing image:
+This framework helps to estimate the human pose on an image. The parts of the human body used in this project are shown on the following image:
 
 <img src="sample-images/vitruvian_shape.png?sanitize=true&raw=true" />
 
