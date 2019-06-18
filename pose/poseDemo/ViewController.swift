@@ -20,7 +20,8 @@ class ViewController: UIViewController {
     private lazy var imagePicker = {
         return UIImagePickerController()
     }()
-    
+    @IBOutlet weak var textLabel: UILabel!
+
     private let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
     private var testImage: UIImage?
     
@@ -59,6 +60,7 @@ class ViewController: UIViewController {
             DispatchQueue.main.async {
                 self.log.debug("CoreML processing time \(self.pose.coreMLProcessingTime) ms")
                 self.log.debug("Post processing time \(self.pose.postProcessingTime) ms")
+                self.textLabel.text = "CoreML: \(self.pose.coreMLProcessingTime)ms PP: \(self.pose.postProcessingTime)ms"
                 self.imageCount = ViewController.totalImagesCount
                 self.activityIndicator.stopAnimating()
             }

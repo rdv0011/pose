@@ -80,14 +80,16 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 |   NN input size    | iPhone XR (ms)   | iPhone 8 (ms) | iPhone 5S (ms) |
 |:-------------------:|:-------------------:|:-----------------:|:------------------:|
 |      CoreML       |
-|      512 x 512       |          210            |      3670          |        20801        |
-|      256 x 256       |          100            |       868           |         7162         |
-|      Post-processing       |
-|      512 x 512       |                      |                |        100        |
-|      256 x 256       |                      |                  |                  |
-|      Total       |
-|      512 x 512       |                      |                |        100        |
-|      256 x 256       |                      |                  |                  |
+|      512 x 512       |          190            |      3670          |        20801        |
+|      256 x 256       |          70            |       1039        |         7162         |
+|      **Post-processing**      |
+|      512 x 512       |          19          |        67        |        100        |
+|      256 x 256       |          5           |       35         |                  |
+|      **Total**       |
+|      512 x 512       |          219       |       3737     |        20901        |
+|      256 x 256       |           75          |     1074     |           7200       |
+
+All numbers shown above could vary for each particular run.
 
 ### The result pose depending on the NN input size (the smaller and faster the less accurate result is)
 |      512 x 512       |    256 x 256       |
@@ -99,13 +101,14 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 ### Healthcare
 
 1) Detecting anomalies in the human spine on still images:
-<img src="sample-images/pose-result-scoliosis.png?sanitize=true&raw=true" />
+    <img src="sample-images/pose-result-scoliosis.png?sanitize=true&raw=true" />
 2) Health and fitness guide.
+
 
 ### Home security and automation (not related to mobile phones)
 
-a) Detecting if people at home and check if all the equipment is switched off (iron / owen).
-b) Locating people inside the living area and do automation (turn on lights / music / tv)
+1) Detecting if people at home and check if all the equipment is switched off (iron / owen).
+2) Locating people inside the living area and do automation (turn on lights / music / tv)
 
 ## Some fun
 |   |   |

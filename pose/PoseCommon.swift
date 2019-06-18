@@ -75,7 +75,7 @@ public protocol PoseModelConfiguration {
 
 public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
 
-    public var inputSize = CGSize(width: 512, height: 512)
+    public var inputSize = CGSize(width: 256, height: 256)
 
     public var outputWidth: Int {
         return Int(inputSize.width / 8)
