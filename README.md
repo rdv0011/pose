@@ -75,7 +75,7 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 
 ## Performance
 
-### Time to process one frame
+### Time to process one frame (1-2 persons in the view)
 
 |   NN input size    | iPhone XR (ms)   | iPhone 8 (ms) | iPhone 5S (ms) |
 |:-------------------:|:-------------------:|:-----------------:|:------------------:|
@@ -109,6 +109,16 @@ All numbers shown above could vary for each particular run.
 
 1) Detecting if people at home and check if all the equipment is switched off (iron / owen).
 2) Locating people inside the living area and do automation (turn on lights / music / tv)
+
+## Improvements
+1) NMS optimization. A parallel GPU implementation using METAL API.
+2) Use a diferent approximation for joints connection that is closer to a real life sceleton bones. Bones are not straight.
+3) Implement more robust filtering for the output pose to get rid of artifacts.
+4) Implement a pose estimation on a video stream
+
+## In-Depth information
+1) http://posefs1.perception.cs.cmu.edu/Users/ZheCao/Multi-person%20pose%20estimation-CMU.pdf
+2) https://www.ri.cmu.edu/wp-content/uploads/2017/04/thesis.pdf
 
 ## Some fun
 |   |   |
