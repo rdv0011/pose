@@ -1,0 +1,21 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2473
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 1. What the project is about?\
+2. Why I have been interested in this project?\
+   Deep Learning continues to be a \'93hot topic\'94. Besides the scientific value it bring more intelligence into the applications.\
+3. What exactly is done?\
+   The idea from the other open source project was implemented on iOS. I took a trained CNN from another project and converted it to the iOS format. Also I have tried to implement the post processing pipeline in swift. It is worth mentioning that the original project is written in C++ for CUDA GPU. I have tried to implement an approach I have learned in Swift.\
+4. The questions I answered for myself are:\
+   Yes, it is possible to convert and run trained network on iOS\
+   Yes, it runs with a good performance.\
+4. Where the project resides?\
+ github.com\
+5. A brief intro to CNN.\
+   It consists of the input, output and a number of hidden layers. One of the types of layer is called convolutional that is core block of CNN. The parameters of the layer consists of filters/kernel that represent a specific feature (a line or a cross for example).During the processing  the kernels are moved along the width and height of the input and a dot product with the input is done which forms an activation field that shows where the specific feature is located.\
+6. The output of CNN in the project costs of several layers. They might be decided into two parts HeatMaps and PAF\'92s. Heatmaps highlights where the particular joint of the human body reside. PAf\'92s helps to connect joints together.\
+7. Live demo on a Lego toy ) }
