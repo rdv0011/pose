@@ -2,6 +2,7 @@
 This framework estimates the human pose on an image. The parts of the human body used in this project are shown on the following image:
 
 <img src="sample-images/vitruvian_shape.png?sanitize=true&raw=true" />
+More information regarding the human pose model might be found here: [MPI-pose](https://pose.mpi-inf.mpg.de/)
 
 | For the demo purposes I took images with myself)                | The result human pose estimation drawn over the original image  |
 | :----------------------------------------------------------------------------------------------------------------------------: |:---------------------------------------------------------------------------:|
@@ -119,6 +120,7 @@ All numbers shown above could vary for each particular run.
 ## In-Depth information
 1) http://posefs1.perception.cs.cmu.edu/Users/ZheCao/Multi-person%20pose%20estimation-CMU.pdf
 2) https://www.ri.cmu.edu/wp-content/uploads/2017/04/thesis.pdf
+3) https://pose.mpi-inf.mpg.de/
 
 ## Some fun
 |   |   |
