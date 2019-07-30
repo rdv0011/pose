@@ -58,7 +58,7 @@ POSE_MPI_BODY_PARTS {
 ```
 
 ### Heatmaps and PAFs
-There are two types of output matices in the MPI15 model. The ones that represent heatmaps and the others that represent PAFs. Each heat matrix corresponds to one joint part which is 15 in total. The PAF matices represent body connections. For each body connection there is X and Y matrix which is 28 in total (14 + 14). The total amount of matrices including so called a background one is 44.
+There are two types of output matrices in the MPI15 model. The ones that represent heatmaps and the others that represent PAFs. Each heat matrix corresponds to one joint part which is 15 in total. The PAF matrices represent body connections. For each body connection there is X and Y matrix which is 28 in total (14 + 14). The total amount of matrices including so called a background one is 44.
 
 ## Demo project
 The repository also contains a demo project 'poseDemo' that demonstrates usage of the framework.
