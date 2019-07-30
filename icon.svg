@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
+ <defs>
+  <radialGradient id="svg_35" spreadMethod="pad">
+   <stop offset="0" stop-color="#ffc95e"/>
+   <stop offset="1" stop-color="#000000" stop-opacity="0.996094"/>
+  </radialGradient>
+ </defs>
+ <g class="layer">
+  <title>Layer 1</title>
+  <rect fill="url(#svg_35)" height="596" id="svg_32" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" width="596" x="3.5" y="2.5"/>
+  <circle cx="300.499462" cy="300.499469" fill="none" id="svg_1" r="295.999462" stroke="#ffffff" stroke-width="5"/>
+  <line fill="none" id="svg_18" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="299.5" x2="300.5" y1="79.5" y2="156.5"/>
+  <rect fill="none" height="519.000064" id="svg_2" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" width="459.000033" x="70.50001" y="77.499998"/>
+  <line fill="none" id="svg_20" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="299.500006" x2="527.499989" y1="157.5" y2="79.5"/>
+  <line fill="none" id="svg_21" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="299.5" x2="300.5" y1="158.5" y2="346.5"/>
+  <line fill="none" id="svg_22" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="300.5" x2="379.5" y1="345.5" y2="447.5"/>
+  <line fill="none" id="svg_23" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="377.499998" x2="457.500004" y1="444.5" y2="548.499995"/>
+  <line fill="none" id="svg_24" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="299.5" x2="300.5" y1="348.5" y2="594.5"/>
+  <line fill="none" id="svg_25" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="300.5" x2="329.499999" y1="350.5" y2="593.500001"/>
+  <line fill="none" id="svg_26" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="299.5" x2="144.5" y1="347.5" y2="551.5"/>
+  <line fill="none" id="svg_27" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="298.5" x2="71.5" y1="156.5" y2="80.5"/>
+  <line fill="none" id="svg_28" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="300.5" x2="528.499987" y1="159.5" y2="149.5"/>
+  <line fill="none" id="svg_29" stroke="#ffffff" stroke-dasharray="null" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" x1="299.5" x2="72.5" y1="158.5" y2="146.5"/>
+ </g>
+</svg>
