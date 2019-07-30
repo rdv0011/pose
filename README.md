@@ -1,5 +1,5 @@
 # Human Pose estimation
-This framework estimates the human pose on an image. The parts of the human body used in this project are shown on the following image:
+This framework estimates the human pose on an image. The parts of the human body used in this project are shown in the following image:
 
 <img src="sample-images/vitruvian_shape.png?sanitize=true&raw=true" />
 More information regarding the human pose model might be found here: [MPI-pose](https://pose.mpi-inf.mpg.de/)
@@ -27,12 +27,12 @@ input_dim: 1 # This value will be defined at runtime ->  input_dim: 512
 `python convertModel.py`
 
 The above mentioned script contains hardcoded values to the file pose_deploy_linevec_faster_4_stages_fixed_size.prototxt and model file pose_iter_160000.caffemodel.
-They could be changed to some other model but please do not forget to change the .prototxt file to have fixed size of the input image:
+They could be changed to some other model but please do not forget to change the .prototxt file to have a fixed size of the input image:
 input_dim: XXX  - corresponds to the with of the NN input.
 input_dim: XXX  - corresponds to the height of the NN input.
-Also **do not forget to change the model configuration PoseModelConfigurationMPI15.inputSize to a specified input values** and use this configuration instead an existing one in hte framework which sets 512x512 as an input size.
+Also **do not forget to change the model configuration PoseModelConfigurationMPI15.inputSize to a specified input value** and use this configuration instead of an existing one in the framework which sets 512x512 as an input size.
 
-Any values will work but the best results could be achieved if an aspect ratio matches the one that an original image has. Also it should be taken into account that bigger values will affect the performance significantly which is shown in the [Performance](#Performance) .
+Any values will work but the best results could be achieved if an aspect ratio matches the one that an original image has. Also, it should be taken into account that bigger values will affect the performance significantly which is shown in the [Performance](#Performance).
 
 ## Neural network output details
 The output of the MPI15 model is a group of matrices whith dimensions `(input_image_width / 8, input_image_height / 8)`. Each element in the matrix has float type. Mapping between matrix index in the output and the body part:
@@ -58,7 +58,7 @@ POSE_MPI_BODY_PARTS {
 ```
 
 ### Heatmaps and PAFs
-There are two types of output matrices in the MPI15 model. The ones that represent heatmaps and the others that represent PAFs. Each heat matrix corresponds to one joint part which is 15 in total. The PAF matrices represent body connections. For each body connection there is X and Y matrix which is 28 in total (14 + 14). The total amount of matrices including so called a background one is 44.
+There are two types of output matrices in the MPI15 model. The ones that represent heatmaps and the others that represent PAFs. Each heat matrix corresponds to one joint part which is 15 in total. The PAF matrices represent body connections. For each body connection, there is X and Y matrix which is 28 in total (14 + 14). The total amount of matrices including the one that represents a background is 44.
 
 ## Demo project
 The repository also contains a demo project 'poseDemo' that demonstrates usage of the framework.
@@ -108,12 +108,12 @@ All numbers shown above could vary for each particular run.
 
 ### Home security and automation (not related to mobile phones)
 
-1) Detecting if people at home and check if all the equipment is switched off (iron / owen).
-2) Locating people inside the living area and do automation (turn on lights / music / tv)
+1) Detecting if people at home and check if all the equipment is switched off (iron/owen).
+2) Locating people inside the living area and do automation (turn on lights/music/tv)
 
 ## Improvements
 1) NMS optimization. A parallel GPU implementation using METAL API.
-2) Use a diferent approximation for joints connection that is closer to a real life sceleton bones. Bones are not straight.
+2) Use a different approximation for joints connection that is closer to real-life skeleton bones. Bones are not straight.
 3) Implement more robust filtering for the output pose to get rid of artifacts.
 4) Implement a pose estimation on a video stream
 
