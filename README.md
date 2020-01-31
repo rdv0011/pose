@@ -34,6 +34,14 @@ Also **do not forget to change the model configuration PoseModelConfigurationMPI
 
 Any values will work but the best results could be achieved if an aspect ratio matches the one that an original image has. Also, it should be taken into account that bigger values will affect the performance significantly which is shown in the [Performance](#Performance).
 
+## Run the demo app in Xcode
+To run the demo the Cocoapods dependencies should be installed first. Run the following command in the Terminal app:
+```
+> cd <project-root-location>/pose
+> pod install
+```
+Once the dependencies are installed open the pose.xcworkspace file in the Xcode. Select the poseDemo target and press build and Run button.
+
 ## Neural network output details
 The output of the MPI15 model is a group of matrices whith dimensions `(input_image_width / 8, input_image_height / 8)`. Each element in the matrix has float type. Mapping between matrix index in the output and the body part:
 ```
