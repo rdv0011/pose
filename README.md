@@ -4,7 +4,7 @@ This framework estimates the human pose on an image. The parts of the human body
 <img src="sample-images/vitruvian_shape.png?sanitize=true&raw=true" />
 More information regarding the human pose model might be found here: [MPI-pose](https://pose.mpi-inf.mpg.de/)
 
-| For the demo purposes I took images with myself)                | The result human pose estimation drawn over the original image  |
+| For the demo purposes I took images with myself)                | The resulting human pose estimation drawn over the original image  |
 | :----------------------------------------------------------------------------------------------------------------------------: |:---------------------------------------------------------------------------:|
 | <img src="pose/poseDemo/Assets.xcassets/sample-pose1-resized.imageset/sample-pose1-resized.png" /> | <img src="sample-images/pose-result.png" /> |
 
@@ -92,7 +92,7 @@ The repository also contains a demo project 'poseDemo' that demonstrates usage o
 
 All numbers shown above could vary for each particular run.
 
-### The result pose depending on the NN input size (the smaller and faster the less accurate result is)
+### The resulting pose depending on the NN input size (the smaller and faster the less accurate result is)
 |      512 x 512       |    256 x 256       |
 | :----------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------:|
 |     <img src="sample-images/pose-result.png?sanitize=true&raw=true" />       |          <img src="sample-images/pose-result-256x256.png?sanitize=true&raw=true" />       |
