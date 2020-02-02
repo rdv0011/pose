@@ -12,12 +12,13 @@ import Vision
 import CoreMLHelpers
 import SwiftyBeaver
 
-open class PoseEstimation {
+open class PoseEstimation<C: PoseModelConfiguration, J: JointConnectionProtocol> {
+    public typealias JointScore = JointConnectionScore<J>
 
     private let model: MLModel
     
     // Model configuration
-    private let modelConfig: PoseModelConfiguration
+    private let modelConfig: C
     
     private var coremlProcessingStart = Date()
     private var coremlProcessingFinish = Date()
@@ -30,10 +31,10 @@ open class PoseEstimation {
     private(set) var networkOutput: Array<Float> = []
     private(set) var heatMapCandidates: [HeatMapJointCandidate] = []
     private(set) var filteredHeatMapCandidates: [HeatMapJointCandidate] = []
-    private(set) var allConnectionCandidates: [JointConnectionWithScore] = []
-    private(set) var humanConnections: [Int: [JointConnectionWithScore]] = [:]
+    private(set) var allConnectionCandidates: [JointScore] = []
+    private(set) var humanConnections: [Int: [JointScore]] = [:]
     
-    public init(model: MLModel, modelConfig: PoseModelConfiguration) {
+    public init(model: MLModel, modelConfig: C) {
         self.model = model
         self.modelConfig = modelConfig
     }
@@ -115,7 +116,7 @@ open class PoseEstimation {
         return -1
     }
     
-    public func estimate(on image: UIImage, completion: @escaping (([Int: [JointConnectionWithScore]]) -> ())) {
+    public func estimate(on image: UIImage, completion: @escaping (([Int: [JointScore]]) -> ())) {
         
         var uiImage = image
         if image.size != modelConfig.inputSize {
@@ -148,7 +149,7 @@ open class PoseEstimation {
                                                 y: Int(CGFloat($0.joint1.y) * scaleFactor + offsetY))
                         let joint2 = JointPoint(x: Int(CGFloat($0.joint2.x) * scaleFactor + offsetX),
                                                 y: Int(CGFloat($0.joint2.y) * scaleFactor + offsetY))
-                        return JointConnectionWithScore(connection: $0.connection,
+                        return JointConnectionScore(connection: $0.connection,
                                                             score: $0.score,
                                                             offsetJoint1: $0.offsetJoint1,
                                                             offsetJoint2: $0.offsetJoint2,
@@ -181,7 +182,7 @@ open class PoseEstimation {
 extension PoseEstimation {
     
     private func mlRequest(model: MLModel,
-                           completion: @escaping (([Int: [JointConnectionWithScore]]) -> ())) throws -> VNCoreMLRequest {
+                           completion: @escaping (([Int: [JointScore]]) -> ())) throws -> VNCoreMLRequest {
         let model = try VNCoreMLModel(for: model)
         let coremlRequest = VNCoreMLRequest(model: model) { request, error in
             
@@ -252,13 +253,13 @@ extension PoseEstimation {
                         self.filteredHeatMapCandidates += boxIndices.map { candidates[$0] }
                     }
                     
-                    let pose = PoseModelConfigurationMPI15()
+                    let pose = self.modelConfig.instance()
                     // Map layerIndex to joint type
                     let candidatesByJoints = Dictionary(grouping: self.filteredHeatMapCandidates, by: { pose.joints[$0.layerIndex] })
                     // Get joint connections with scores based on PAF matrices
                     self.allConnectionCandidates = []
-                    var connections: [JointConnectionWithScore] = []
-                    var connectionCandidates: [JointConnectionWithScore] = []
+                    var connections: [JointScore] = []
+                    var connectionCandidates: [JointScore] = []
                     pose.jointConnections.forEach { connection in
 
                         let (indexX, indexY) = connection.pafIndices
@@ -287,12 +288,12 @@ extension PoseEstimation {
                                     if s > 0 {
                                         let jointPoint1 = JointPoint(x: x1, y: y1)
                                         let jointPoint2 = JointPoint(x: x2, y: y2)
-                                        let connWithCoords = JointConnectionWithScore(connection: connection,
-                                                                                      score: s,
-                                                                                      offsetJoint1: offset1,
-                                                                                      offsetJoint2: offset2,
-                                                                                      joint1: jointPoint1,
-                                                                                      joint2: jointPoint2)
+                                        let connWithCoords = JointConnectionScore(connection: connection,
+                                                                                  score: s,
+                                                                                  offsetJoint1: offset1,
+                                                                                  offsetJoint2: offset2,
+                                                                                  joint1: jointPoint1,
+                                                                                  joint2: jointPoint2)
                                         connectionCandidates.append(connWithCoords)
                                     }
                                 }
@@ -350,9 +351,9 @@ extension HeatMapJointCandidate {
     }
 }
 
-extension JointConnectionWithScore {
-    func scaled(kx: CGFloat, ky: CGFloat) -> JointConnectionWithScore {
-        return JointConnectionWithScore(connection: self.connection , score: self.score,
+extension JointConnectionScore {
+    func scaled(kx: CGFloat, ky: CGFloat) -> JointConnectionScore {
+        return JointConnectionScore(connection: self.connection , score: self.score,
                                         offsetJoint1: self.offsetJoint1, offsetJoint2: self.offsetJoint2,
                                         joint1: JointPoint(x: Int(kx * CGFloat(self.joint1.x)),
                                                            y: Int(ky * CGFloat(self.joint1.y))),
