@@ -12,7 +12,7 @@ import Vision
 import CoreMLHelpers
 import SwiftyBeaver
 
-open class PoseEstimation<C: PoseModelConfiguration, J: JointConnectionProtocol> {
+open class PoseEstimation<C: PoseModelConfiguration, J> where J == C.C.J {
     public typealias JointScore = JointConnectionScore<J>
 
     private let model: MLModel
@@ -288,7 +288,7 @@ extension PoseEstimation {
                                     if s > 0 {
                                         let jointPoint1 = JointPoint(x: x1, y: y1)
                                         let jointPoint2 = JointPoint(x: x2, y: y2)
-                                        let connWithCoords = JointConnectionScore(connection: connection,
+                                        let connWithCoords = JointScore(connection: connection,
                                                                                   score: s,
                                                                                   offsetJoint1: offset1,
                                                                                   offsetJoint2: offset2,

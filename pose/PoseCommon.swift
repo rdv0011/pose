@@ -17,9 +17,9 @@ public struct JointPoint: Hashable {
 }
 
 protocol JointConnectionScoreProtocol {
-    associatedtype T: JointConnectionProtocol
+    associatedtype J: JointConnectionProtocol
     
-    var connection: T { get }
+    var connection: J { get }
     var score: Float32 { get }
     var offsetJoint1: Int { get }
     var offsetJoint2: Int { get }
@@ -27,8 +27,8 @@ protocol JointConnectionScoreProtocol {
     var joint2: JointPoint { get }
 }
 
-public struct JointConnectionScore<T: JointConnectionProtocol>: JointConnectionScoreProtocol {
-    let connection: T
+public struct JointConnectionScore<J: JointConnectionProtocol>: JointConnectionScoreProtocol {
+    let connection: J
     let score: Float32
     let offsetJoint1: Int
     let offsetJoint2: Int
