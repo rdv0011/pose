@@ -113,7 +113,7 @@ extension Array where Element == HeatMapJointCandidate {
     }
 }
 
-extension Array where Element == JointConnectionWithScore {
+extension Array where Element: JointConnectionScoreProtocol {
     
     /// Draws connections on a specified image
     /// The alpha is constant if specified or is dynamically calculated based on a confidence otherwise

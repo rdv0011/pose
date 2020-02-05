@@ -16,8 +16,19 @@ public struct JointPoint: Hashable {
     }
 }
 
-public struct JointConnectionWithScore {
-    let connection: PoseModelConfigurationMPI15.JointConnection
+protocol JointConnectionScoreProtocol {
+    associatedtype J: JointConnectionProtocol
+    
+    var connection: J { get }
+    var score: Float32 { get }
+    var offsetJoint1: Int { get }
+    var offsetJoint2: Int { get }
+    var joint1: JointPoint { get }
+    var joint2: JointPoint { get }
+}
+
+public struct JointConnectionScore<J: JointConnectionProtocol>: JointConnectionScoreProtocol {
+    let connection: J
     let score: Float32
     let offsetJoint1: Int
     let offsetJoint2: Int
@@ -38,7 +49,7 @@ struct Pose {
     }
 }
 
-enum BodyJoint: String, CaseIterable {
+public enum BodyJoint: String, CaseIterable {
     case head, neck,
     rShoulder, rElbow, rWrist,
     lShoulder, lElbow, lWrist,
@@ -57,7 +68,107 @@ enum BodyJoint: String, CaseIterable {
     }
 }
 
+public protocol JointConnectionProtocol: Equatable {
+    associatedtype T: Equatable
+    static var array: [T] { get }
+    var joints: (BodyJoint, BodyJoint) { get }
+    var color: UIColor { get }
+    func index() -> Int
+    var pafIndices: (x: Int, y: Int)  { get }
+}
+
+func ==<Joint1: JointConnectionProtocol, Joint2: JointConnectionProtocol> (lhs: Joint1, rhs: Joint2) -> Bool {
+    return true
+}
+
+public enum JointConnectionMPI15: String, CaseIterable, JointConnectionProtocol {
+    case headNeck,
+    neckRShoulder, rShoulderRElbow, rElbowRWrist,
+    neckLShoulder, lShoulderLElbow, lElbowLWrist,
+    neckChest,
+    chestRHip, rHipRKnee, rKneeRAnkle,
+    chestLHip, lHipLKnee, lKneeLAnkle
+    
+    public static var array: [Self] { return self.allCases }
+    
+    public var joints: (BodyJoint, BodyJoint) {
+        switch self {
+        case .headNeck:
+            return (.head, .neck)
+        case .neckRShoulder:
+            return (.neck, .rShoulder)
+        case .rShoulderRElbow:
+            return (.rShoulder, .rElbow)
+        case .rElbowRWrist:
+            return (.rElbow, .rWrist)
+        case .neckLShoulder:
+            return (.neck, .lShoulder)
+        case .lShoulderLElbow:
+            return (.lShoulder, .lElbow)
+        case .lElbowLWrist:
+            return (.lElbow, .lWrist)
+        case .neckChest:
+            return (.neck, .chest)
+        case .chestRHip:
+            return (.chest, .rHip)
+        case .rHipRKnee:
+            return (.rHip, .rKnee)
+        case .rKneeRAnkle:
+            return (.rKnee, .rAnkle)
+        case .chestLHip:
+            return (.chest, .lHip)
+        case .lHipLKnee:
+            return (.lHip, .lKnee)
+        case .lKneeLAnkle:
+            return (.lKnee, .lAnkle)
+        }
+    }
+    
+    public var pafIndices: (x: Int, y: Int) {
+        switch self {
+        case .headNeck:
+            return (x: 0, y: 1)
+        case .neckRShoulder:
+            return (x: 2, y: 3)
+        case .rShoulderRElbow:
+            return (x: 4, y: 5)
+        case .rElbowRWrist:
+            return (x: 6, y: 7)
+        case .neckLShoulder:
+            return (x: 8, y: 9)
+        case .lShoulderLElbow:
+            return (x: 10, y: 11)
+        case .lElbowLWrist:
+            return (x: 12, y: 13)
+        case .neckChest:
+            return (x: 14, y: 15)
+        case .chestRHip:
+            return (x: 16, y: 17)
+        case .rHipRKnee:
+            return (x: 18, y: 19)
+        case .rKneeRAnkle:
+            return (x: 20, y: 21)
+        case .chestLHip:
+            return (x: 22, y: 23)
+        case .lHipLKnee:
+            return (x: 24, y: 25)
+        case .lKneeLAnkle:
+            return (x: 26, y: 27)
+        }
+    }
+    
+    public var color: UIColor {
+        return self.joints.1.color
+    }
+    
+    public func index() -> Int {
+        return JointConnectionMPI15.array.firstIndex(of: self)!
+    }
+}
+
 public protocol PoseModelConfiguration {
+    associatedtype C: PoseModelConfiguration
+    associatedtype J: JointConnectionProtocol
     var layersCount: Int { get }
     var backgroundLayerIndex: Int { get }
     var pafLayerStartIndex: Int { get }
@@ -71,10 +182,12 @@ public protocol PoseModelConfiguration {
     var minNmsThreshold: Float32 { get }
     var maxNmsThreshold: Float32 { get }
     var nmsWindowSize: Int { get }
+    func instance() -> C
+    var joints: [BodyJoint] { get }
+    var jointConnections: [J] { get }
 }
 
 public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
-
     public var inputSize = CGSize(width: 512, height: 512)
 
     public var outputWidth: Int {
@@ -103,95 +216,14 @@ public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
     public var maxNmsThreshold: Float32 = Float32(0.3) // for MPI with 4 stages that is a fast version
     public var nmsWindowSize: Int = 7
     
-    var joints = BodyJoint.array
-    var jointConnections = JointConnection.array
-    
-    enum JointConnection: String, CaseIterable {
-        case headNeck,
-        neckRShoulder, rShoulderRElbow, rElbowRWrist,
-        neckLShoulder, lShoulderLElbow, lElbowLWrist,
-        neckChest,
-        chestRHip, rHipRKnee, rKneeRAnkle,
-        chestLHip, lHipLKnee, lKneeLAnkle
-        
-        static var array: [JointConnection] { return self.allCases }
-        
-        var joints: (BodyJoint, BodyJoint) {
-            switch self {
-            case .headNeck:
-                return (.head, .neck)
-            case .neckRShoulder:
-                return (.neck, .rShoulder)
-            case .rShoulderRElbow:
-                return (.rShoulder, .rElbow)
-            case .rElbowRWrist:
-                return (.rElbow, .rWrist)
-            case .neckLShoulder:
-                return (.neck, .lShoulder)
-            case .lShoulderLElbow:
-                return (.lShoulder, .lElbow)
-            case .lElbowLWrist:
-                return (.lElbow, .lWrist)
-            case .neckChest:
-                return (.neck, .chest)
-            case .chestRHip:
-                return (.chest, .rHip)
-            case .rHipRKnee:
-                return (.rHip, .rKnee)
-            case .rKneeRAnkle:
-                return (.rKnee, .rAnkle)
-            case .chestLHip:
-                return (.chest, .lHip)
-            case .lHipLKnee:
-                return (.lHip, .lKnee)
-            case .lKneeLAnkle:
-                return (.lKnee, .lAnkle)
-            }
-        }
-        
-        var pafIndices: (x: Int, y: Int) {
-            switch self {
-            case .headNeck:
-                return (x: 0, y: 1)
-            case .neckRShoulder:
-                return (x: 2, y: 3)
-            case .rShoulderRElbow:
-                return (x: 4, y: 5)
-            case .rElbowRWrist:
-                return (x: 6, y: 7)
-            case .neckLShoulder:
-                return (x: 8, y: 9)
-            case .lShoulderLElbow:
-                return (x: 10, y: 11)
-            case .lElbowLWrist:
-                return (x: 12, y: 13)
-            case .neckChest:
-                return (x: 14, y: 15)
-            case .chestRHip:
-                return (x: 16, y: 17)
-            case .rHipRKnee:
-                return (x: 18, y: 19)
-            case .rKneeRAnkle:
-                return (x: 20, y: 21)
-            case .chestLHip:
-                return (x: 22, y: 23)
-            case .lHipLKnee:
-                return (x: 24, y: 25)
-            case .lKneeLAnkle:
-                return (x: 26, y: 27)
-            }
-        }
-        
-        var color: UIColor {
-            return self.joints.1.color
-        }
-        
-        func index() -> Int {
-            return JointConnection.array.firstIndex(of: self)!
-        }
+    public var joints = BodyJoint.array
+    public var jointConnections = JointConnectionMPI15.array
+
+    public init() {
     }
     
-    public init() {
+    public func instance() -> PoseModelConfigurationMPI15 {
+        PoseModelConfigurationMPI15()
     }
 }
 
