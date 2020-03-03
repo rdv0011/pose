@@ -14,30 +14,44 @@ extension Array where Element == Float {
     /// If the source array is empty the output is nil
     /// If there is one element in the source array only the output will be the highestValue
     /// If the input if onle element that is equal to zero the output is zero also
-    private func converted(from values: [Float], highestValue: Float) -> [Float]? {
+    private func converted(from values: [Float], highestValue: Float, removeBackground: Bool = false) -> [Float]? {
         var factor = Double(1)
         var min = Float(0)
         guard let scoreMin = values.min(), let scoreMax = values.max() else {
             return nil
         }
+        var backgroundValue = Float(0)
+        if removeBackground {
+            let countedValues = NSCountedSet(array: values)
+            let sortedValues = countedValues.sorted { countedValues .count(for: $0) > countedValues .count(for: $1) }
+            backgroundValue = sortedValues[0] as? Float ?? 0.0
+        }
+        
         if scoreMax - scoreMin > 0.0001  {
             factor = Double(highestValue) / Double(scoreMax - scoreMin)
             min = scoreMin
         } else if scoreMax != 0 {
             factor = Double(highestValue) / Double(scoreMax)
         }
-        return values.map { Float(Double(($0 - min)) * factor) }
+        let convertedValues = values.map { value -> Float in
+            guard value != backgroundValue else {
+                return 0
+            }
+            return Float(Double((value - min)) * factor)
+        }
+        
+        return convertedValues
     }
     
     /// Generates an image out of the array
     /// The width and height indicate the size of the output image
     /// The values in the array are scaled to the range [0, 255]
     /// The size of the array should be greater or equal to width * height
-    func draw(width: Int, height: Int) -> UIImage {
-        guard let convertedValues = converted(from : self, highestValue: 255) else {
+    func draw(width: Int, height: Int, removeBackground: Bool = false) -> UIImage {
+        guard let convertedValues = converted(from : self, highestValue: 255, removeBackground: removeBackground) else {
             return UIImage()
         }
-        guard let image = CGImage.fromByteArrayGray(convertedValues.map({ UInt8($0) }),
+        guard let image = CGImage.fromByteArrayGray(convertedValues.map(UInt8.init),
                                                     width: width,
                                                     height: height) else {
                                                         
@@ -63,7 +77,7 @@ extension Array where Element == Float {
             let endIndex = Swift.min(idx + matSize, self.count - 1)
             let matArray = Array(self[idx..<endIndex])
             let color = colors[(idx / matSize) % colors.count]
-            let image = matArray.draw(width: width, height: height).tinted(with: color)
+            let image = matArray.draw(width: width, height: height, removeBackground: true).tinted(with: color)
             if idx == 0 {
                 finalImage = image
             } else {

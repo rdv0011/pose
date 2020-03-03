@@ -1,0 +1,2 @@
+python convertTF2CoreML.py --frozen_pb_file=./singlePoseModel/model.pb --output_coreml_file=./PoseMNV2_Single_14.mlmodel --input_node_name=image --output_node_name=Convolutional_Pose_Machine/stage_5_out
+python convertCafee2CoreML.py --caffe_model_file=./multiPoseModel/mpi/pose_iter_160000.caffemodel --proto_file=./multiPoseModel/mpi/pose_deploy_linevec_faster_4_stages.prototxt --output_model_file=./PoseCNN_Multi_15.mlmodel --input_node_names=image --output_node_name=net_output
