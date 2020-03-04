@@ -17,7 +17,7 @@ class PoseTests: XCTestCase {
     var testImage: UIImage?
 
     override func setUp() {
-        pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
+        pose = PoseEstimation(model: PoseModel().model, modelConfiguration: ModelConfigurationCNNMulti15())
         testImage = UIImage(named: "sample-pose1-resized", in: Bundle(for: PoseTests.self), compatibleWith: nil)
     }
 
@@ -41,7 +41,7 @@ class PoseTests: XCTestCase {
     }
 
     func testStride() {
-        let pose = PoseEstimation(model: PoseModel().model, modelConfig: PoseModelConfigurationMPI15())
+        let pose = PoseEstimation(model: PoseModel().model, modelConfiguration: ModelConfigurationCNNMulti15())
         let strideResult = [[0, 0, 4, 0, 5], [0, 0, -4, 0, 5], [0, 0, -4, -4, 5],
         [-4, -4, 0, 0, 5], [0, -4, 0, 0, 5], [0, -4, 0, 0, 5],
         [0, 0, 4, 2, 5], [0, 0, -4, -2, 5], [0, 0, -2, -4, 5]]

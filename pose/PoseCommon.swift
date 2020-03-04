@@ -81,7 +81,7 @@ func ==<Joint1: JointConnectionProtocol, Joint2: JointConnectionProtocol> (lhs: 
     return true
 }
 
-public enum JointConnectionMPI15: String, CaseIterable, JointConnectionProtocol {
+public enum JointConnectionCNNMulti15: String, CaseIterable, JointConnectionProtocol {
     case headNeck,
     neckRShoulder, rShoulderRElbow, rElbowRWrist,
     neckLShoulder, lShoulderLElbow, lElbowLWrist,
@@ -162,7 +162,7 @@ public enum JointConnectionMPI15: String, CaseIterable, JointConnectionProtocol 
     }
     
     public func index() -> Int {
-        return JointConnectionMPI15.array.firstIndex(of: self)!
+        return JointConnectionCNNMulti15.array.firstIndex(of: self)!
     }
 }
 
@@ -170,12 +170,12 @@ public protocol PoseModelConfiguration {
     associatedtype C: PoseModelConfiguration
     associatedtype J: JointConnectionProtocol
     var layersCount: Int { get }
+    var heatMapLayersCount: Int { get }
     var backgroundLayerIndex: Int { get }
     var pafLayerStartIndex: Int { get }
     var outputWidth: Int { get }
     var outputHeight: Int { get }
     var inputSize: CGSize { get }
-    var scoreThreasholdFactor: Float { get }
     var jointConnectionsCount: Int { get }
     var interMinAboveThreshold: Float32 { get }
     var interThreshold: Float32 { get }
@@ -183,12 +183,13 @@ public protocol PoseModelConfiguration {
     var maxNmsThreshold: Float32 { get }
     var nmsWindowSize: Int { get }
     func instance() -> C
-    var joints: [BodyJoint] { get }
+    func joint(forHeatMapIndex index: Int) -> BodyJoint
     var jointConnections: [J] { get }
+    var singlePerson: Bool { get }
 }
 
-public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
-    public var inputSize = CGSize(width: 512, height: 512)
+public struct ModelConfigurationCNNMulti15: PoseModelConfiguration {
+    public var inputSize = CGSize(width: 384, height: 384)
 
     public var outputWidth: Int {
         return Int(inputSize.width / 8)
@@ -200,11 +201,11 @@ public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
 
     public var layersCount: Int = 44
     
+    public var heatMapLayersCount: Int = 15
+    
     public var backgroundLayerIndex: Int = 15
     
     public var pafLayerStartIndex: Int = 16
-    
-    public var scoreThreasholdFactor: Float = 2
     
     public var jointConnectionsCount: Int {
         return jointConnections.count
@@ -215,15 +216,135 @@ public struct PoseModelConfigurationMPI15: PoseModelConfiguration {
     public var minNmsThreshold: Float32 = Float32(0.1) // for MPI with 4 stages that is a fast version
     public var maxNmsThreshold: Float32 = Float32(0.3) // for MPI with 4 stages that is a fast version
     public var nmsWindowSize: Int = 7
-    
-    public var joints = BodyJoint.array
-    public var jointConnections = JointConnectionMPI15.array
+
+    public func joint(forHeatMapIndex index: Int) -> BodyJoint {
+        BodyJoint.array[index]
+    }
+    public var jointConnections = JointConnectionCNNMulti15.array
+    public var singlePerson = false
 
     public init() {
     }
     
-    public func instance() -> PoseModelConfigurationMPI15 {
-        PoseModelConfigurationMPI15()
+    public func instance() -> ModelConfigurationCNNMulti15 {
+        ModelConfigurationCNNMulti15()
+    }
+}
+
+public enum JointConnectionMNV2Single14: String, CaseIterable, JointConnectionProtocol {
+    case headNeck,
+    neckRShoulder, rShoulderRElbow, rElbowRWrist,
+    neckLShoulder, lShoulderLElbow, lElbowLWrist,
+    neckRHip, rHipRKnee, rKneeRAnkle,
+    neckLHip, lHipLKnee, lKneeLAnkle
+    
+    public static var array: [Self] { return self.allCases }
+    
+    public var joints: (BodyJoint, BodyJoint) {
+        switch self {
+        case .headNeck:
+            return (.head, .neck)
+        case .neckRShoulder:
+            return (.neck, .rShoulder)
+        case .rShoulderRElbow:
+            return (.rShoulder, .rElbow)
+        case .rElbowRWrist:
+            return (.rElbow, .rWrist)
+        case .neckLShoulder:
+            return (.neck, .lShoulder)
+        case .lShoulderLElbow:
+            return (.lShoulder, .lElbow)
+        case .lElbowLWrist:
+            return (.lElbow, .lWrist)
+        case .neckRHip:
+            return (.neck, .rHip)
+        case .rHipRKnee:
+            return (.rHip, .rKnee)
+        case .rKneeRAnkle:
+            return (.rKnee, .rAnkle)
+        case .neckLHip:
+            return (.neck, .lHip)
+        case .lHipLKnee:
+            return (.lHip, .lKnee)
+        case .lKneeLAnkle:
+            return (.lKnee, .lAnkle)
+        }
+    }
+    
+    public var pafIndices: (x: Int, y: Int) {
+        switch self {
+        case .headNeck,
+             .neckRShoulder,
+             .rShoulderRElbow,
+             .rElbowRWrist,
+             .neckLShoulder,
+             .lShoulderLElbow,
+             .lElbowLWrist,
+             .neckRHip,
+             .rHipRKnee,
+             .rKneeRAnkle,
+             .neckLHip,
+             .lHipLKnee,
+             .lKneeLAnkle:
+            return (x: -1, y: -1)
+        }
+    }
+    
+    public var color: UIColor {
+        return self.joints.1.color
+    }
+    
+    public func index() -> Int {
+        return JointConnectionMNV2Single14.array.firstIndex(of: self)!
+    }
+}
+
+public struct ModelConfigurationMNV2Single14: PoseModelConfiguration {
+    public var inputSize = CGSize(width: 192, height: 192)
+
+    public var outputWidth: Int {
+        return Int(inputSize.width / 2)
+    }
+    
+    public var outputHeight: Int {
+        return Int(inputSize.height / 2)
+    }
+
+    public var layersCount: Int = 14
+
+    public var backgroundLayerIndex: Int = -1
+
+    public var heatMapLayersCount: Int = 14
+
+    public var pafLayerStartIndex: Int = -1
+
+    public var jointConnectionsCount: Int {
+        return jointConnections.count
+    }
+    
+    public var interMinAboveThreshold: Float32 = 0.0 // Not used for a single person NN
+    public var interThreshold: Float32 = 0.0 // Not used for a single person NN
+    public var minNmsThreshold: Float32 = Float32(0.1)
+    public var maxNmsThreshold: Float32 = Float32(0.3)
+    public var nmsWindowSize: Int = 12
+    
+    private let joints: [BodyJoint] = [.head, .neck,
+                                       .rShoulder, .rElbow, .rWrist,
+                                       .lShoulder, .lElbow, .lWrist,
+                                       .rHip, .rKnee, .rAnkle,
+                                       .lHip, .lKnee, .lAnkle]
+    public func joint(forHeatMapIndex index: Int) -> BodyJoint {
+        joints[index]
+    }
+    
+    public var jointConnections = JointConnectionMNV2Single14.array
+    public var singlePerson = true
+
+    public init() {
+    }
+    
+    public func instance() -> ModelConfigurationMNV2Single14 {
+        ModelConfigurationMNV2Single14()
     }
 }
 

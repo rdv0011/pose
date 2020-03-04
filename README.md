@@ -9,28 +9,21 @@ More information regarding the human pose model might be found here: [MPI-pose](
 | <img src="pose/poseDemo/Assets.xcassets/sample-pose1-resized.imageset/sample-pose1-resized.png" /> | <img src="sample-images/pose-result.png" /> |
 
 ## Preparing the model
-To start using the framework a Core ML model is needed to be created. This model is based on one from the [openpose project](https://github.com/CMU-Perceptual-Computing-Lab/openpose). To create a model do the following:
-1) Install Python and [CoreML tools](https://apple.github.io/coremltools/index.html)
-2) Run models/getModels.sh from [Open Pose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) to get the original openpose models
-3) Copy models/pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt to models/pose/mpi/pose_deploy_linevec_faster_4_stages_fixed_size.prototxt
-4) Change the following in the file pose_deploy_linevec_faster_4_stages_fixed_size.prototxt:
+The models used in this project are based on [openpose project](https://github.com/CMU-Perceptual-Computing-Lab/openpose) (Caffe) and [PoseEstimation-CoreML](https://github.com/tucan9389/PoseEstimation-CoreML) (Tensorflow)
+The CoreML model files are not included to the repo. To create that files do the following:
+1) Install Python and [CoreML tools](https://apple.github.io/coremltools/index.html) (Python 3.7.5, coremltools 3.1)
+2) Run CoreMLModels/download.sh
+3) Make changes in the file multiPoseModel/mpi/pose_deploy_linevec_faster_4_stages_fixed_size.prototxt:
 ```
 input_dim: 1 # This value will be defined at runtime ->  input_dim: 512
 input_dim: 1 # This value will be defined at runtime ->  input_dim: 512
 ```
-5) Create a link to the models directory. Let's assume that the pose framework project and openpose project are in the home directory, then command to create a link would be the following:
+4) Run CoreMLModels/convert.sh. Upon successful execution the following CoreML files will be created: PoseMNV2_Single_14.mlmodel, PoseCNN_Multi_15.mlmodel. The model PoseMNV2_Single_14 is used to fast inferring of a single person on the image. The PoseCNN_Multi_15 model is used to do more sophisticated inferring of all presented human bodies on the image with significantly slower performance.
 
-`ln -s ~/openpose/models ~/models`
-
-6) Go to the ~/pose/pose/CoreMLModels and run the following command:
-
-`python convertModel.py`
-
-The above mentioned script contains hardcoded values to the file pose_deploy_linevec_faster_4_stages_fixed_size.prototxt and model file pose_iter_160000.caffemodel.
-They could be changed to some other model but please do not forget to change the .prototxt file to have a fixed size of the input image:
+The above mentioned .prototxt contains hardcoded values to have a fixed size of an input image:
 input_dim: XXX  - corresponds to the with of the NN input.
 input_dim: XXX  - corresponds to the height of the NN input.
-Also **do not forget to change the model configuration PoseModelConfigurationMPI15.inputSize to a specified input value** and use this configuration instead of an existing one in the framework which sets 512x512 as an input size.
+When changing thes evalues **do not forget to change the model configuration ModelConfigurationCNNMulti15.inputSize to a specified input value** and use this configuration instead of an existing one in the framework which sets 512x512 as an input size.
 
 Any values will work but the best results could be achieved if an aspect ratio matches the one that an original image has. Also, it should be taken into account that bigger values will affect the performance significantly which is shown in the [Performance](#Performance).
 
@@ -66,7 +59,7 @@ POSE_MPI_BODY_PARTS {
 ```
 
 ### Heatmaps and PAFs
-There are two types of output matrices in the MPI15 model. The ones that represent heatmaps and the others that represent PAFs. Each heat matrix corresponds to one joint part which is 15 in total. The PAF matrices represent body connections. For each body connection, there is X and Y matrix which is 28 in total (14 + 14). The total amount of matrices including the one that represents a background is 44.
+There are two types of output matrices in the PoseCNN_Multi_15 model. The ones that represent heatmaps and the others that represent PAFs. Each heat matrix corresponds to one joint part which is 15 in total. The PAF matrices represent body connections. For each body connection, there is X and Y matrix which is 28 in total (14 + 14). The total amount of matrices including the one that represents a background is 44. The output of the single person model PoseMNV2_Single_14 contains heatmaps and does not contain neither PAF's matrices nor a background layer.
 
 ## Demo project
 The repository also contains a demo project 'poseDemo' that demonstrates usage of the framework.
