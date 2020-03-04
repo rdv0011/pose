@@ -47,7 +47,7 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" alpha="0.84999999999999998" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Desc" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jdO-dU-PVD">
-                                                    <rect key="frame" x="25" y="2" width="23" height="11"/>
+                                                    <rect key="frame" x="22" y="5" width="23" height="11"/>
                                                     <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="9"/>
                                                     <color key="textColor" red="1" green="0.0" blue="0.0198914904" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -55,9 +55,9 @@
                                             </subviews>
                                         </view>
                                         <constraints>
-                                            <constraint firstItem="jdO-dU-PVD" firstAttribute="top" secondItem="t1k-W7-BkC" secondAttribute="top" constant="2" id="2tq-L7-3iZ"/>
+                                            <constraint firstItem="jdO-dU-PVD" firstAttribute="top" secondItem="t1k-W7-BkC" secondAttribute="top" constant="5" id="2tq-L7-3iZ"/>
                                             <constraint firstAttribute="bottom" secondItem="weO-W7-p2F" secondAttribute="bottom" id="4My-cB-VWX"/>
-                                            <constraint firstAttribute="trailing" secondItem="jdO-dU-PVD" secondAttribute="trailing" constant="2" id="GND-u6-gxX"/>
+                                            <constraint firstAttribute="trailing" secondItem="jdO-dU-PVD" secondAttribute="trailing" constant="5" id="GND-u6-gxX"/>
                                             <constraint firstItem="weO-W7-p2F" firstAttribute="top" secondItem="t1k-W7-BkC" secondAttribute="top" id="Pns-aF-6ak"/>
                                             <constraint firstAttribute="trailing" secondItem="weO-W7-p2F" secondAttribute="trailing" id="Ywm-74-dPX"/>
                                             <constraint firstItem="weO-W7-p2F" firstAttribute="leading" secondItem="t1k-W7-BkC" secondAttribute="leading" id="ns2-Ru-8E3"/>

@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import Pose
 
 protocol PoseEstimationViewModelProtocol {
     var joitConnectionCombinedImagesCount: Int { get }
@@ -34,7 +35,7 @@ protocol PoseEstimationViewModelProtocol {
     
     func pafLayersCombinedImage(completion: @escaping ((UIImage)->()))
     
-    func jointsWithConnectionsByLayers(completion: @escaping (([UIImage])->()))
+    func jointsWithConnectionsByLayers(completion: @escaping (([(UIImage, (BodyJoint, BodyJoint))])->()))
     
     func numberOfItemsInSection(_ section: Int) -> Int
     

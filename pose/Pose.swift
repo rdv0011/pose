@@ -498,15 +498,15 @@ extension PoseEstimation {
     /// The pair of heatmaps correcponds to one connection that forms first two images of an output.
     /// There is also two PAF's for X and for Y for each connection that forms other two images of an output.
     /// The sum of two above forms four images for each connection in the result array of images.
-    public func jointsWithConnectionsByLayers(completion: @escaping (([UIImage])->())) {
+    public func jointsWithConnectionsByLayers(completion: @escaping (([(UIImage, (BodyJoint, BodyJoint))])->())) {
         guard self.modelConfiguration.pafLayerStartIndex > 0 else {
             log.debug("Model does not have PAF layers")
-            completion([UIImage(), UIImage(), UIImage(), UIImage()])
+            completion([])
             return
         }
         guard networkOutput.count >= modelConfiguration.layersCount * self.modelOutputLayerStride else {
             log.error("The network output array has an incorrect size or it was not set")
-            completion([UIImage(), UIImage(), UIImage(), UIImage()])
+            completion([])
             return
         }
         DispatchQueue.global(qos: .userInteractive).async {
@@ -514,7 +514,7 @@ extension PoseEstimation {
             let modelOutputHeight = self.modelConfiguration.outputHeight
             let pafLayerStartIndex = self.modelConfiguration.pafLayerStartIndex
             let modelInputSize = self.modelConfiguration.inputSize
-            var resultImages: [UIImage] = []
+            var result: [(UIImage, (BodyJoint, BodyJoint))] = []
             let pose = self.modelConfiguration.instance()
             pose.jointConnections.forEach { connection in
                 let (indexX, indexY) = connection.pafIndices
@@ -564,12 +564,11 @@ extension PoseEstimation {
                 // Draw joint candidates on the heat map layers
                 heatMap1Image = filteredJoints1.draw(alpha: 1.0, radius: 2, lineWidth: 2,
                                                      on: heatMap1Image)
-                resultImages.append(joints1.draw(radius: jointRadius, lineWidth: 1,
-                                                 on: heatMap1Image))
+                result.append((joints1.draw(radius: jointRadius, lineWidth: 1, on: heatMap1Image), connection.joints))
                 heatMap2Image = filteredJoints2.draw(alpha: 1.0, radius: 2, lineWidth: 2,
                                                      on: heatMap2Image)
-                resultImages.append(joints2.draw(radius: jointRadius, lineWidth: 1,
-                                                 on: heatMap2Image))
+                result.append((joints2.draw(radius: jointRadius, lineWidth: 1,
+                                            on: heatMap2Image), connection.joints))
                 
                 // Draw joint candidates and connections on the PAFs layers
                 var pafXJointsConnectionsImage = filteredJoints1.draw(alpha: 1.0, radius: 2 * jointRadius, lineWidth: 3,
@@ -581,12 +580,12 @@ extension PoseEstimation {
                 
                 pafYJointsConnectionsImage = filteredJoints2.draw(alpha: 1.0, radius: 2 * jointRadius, lineWidth: 3,
                                                                   on: pafYJointsConnectionsImage)
-                resultImages.append(jointConns.draw(lineWidth: 2 * connectionWidth,
-                                                    on: pafXJointsConnectionsImage))
-                resultImages.append(jointConns.draw(lineWidth: 2 * connectionWidth,
-                                                    on: pafYJointsConnectionsImage))
+                result.append((jointConns.draw(lineWidth: 2 * connectionWidth,
+                                               on: pafXJointsConnectionsImage), connection.joints))
+                result.append((jointConns.draw(lineWidth: 2 * connectionWidth,
+                                               on: pafYJointsConnectionsImage), connection.joints))
             }
-            completion(resultImages)
+            completion(result)
         }
     }
     

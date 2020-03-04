@@ -18,10 +18,12 @@ class PoseEstimationViewModel<C: PoseModelConfiguration, J> where J == C.C.J {
     private var imageCount = 0 {
         didSet {
             self.imageCache = Array(repeating: nil, count: self.totalImageCount)
+            self.descriptionCache = [:]
             self.view?.reload()
         }
     }
     private var imageCache: [UIImage?] = []
+    private var descriptionCache: [Int: (BodyJoint, BodyJoint)] = [:]
     
     private let poseEstimation: PoseEstimation<C, J>
     private let view: PoseEstimationViewProtocol?
@@ -32,6 +34,7 @@ class PoseEstimationViewModel<C: PoseModelConfiguration, J> where J == C.C.J {
         self.poseEstimation = poseEstimation
         self.view = view
         self.imageCache = Array(repeating: nil, count: self.totalImageCount)
+        self.descriptionCache = [:]
     }
 }
 
@@ -106,7 +109,7 @@ extension PoseEstimationViewModel: PoseEstimationViewModelProtocol {
         self.poseEstimation.pafLayersCombinedImage(completion: completion)
     }
     
-    func jointsWithConnectionsByLayers(completion: @escaping (([UIImage])->())) {
+    func jointsWithConnectionsByLayers(completion: @escaping (([(UIImage, (BodyJoint, BodyJoint))])->())) {
         self.poseEstimation.jointsWithConnectionsByLayers(completion: completion)
     }
     
@@ -123,21 +126,21 @@ extension PoseEstimationViewModel: PoseEstimationViewModelProtocol {
             return
         }
         
-        let imageCacheRow = indexPath.section == 0 ? 0: indexPath.row + 1
+        let itemCacheRow = indexPath.section == 0 ? 0: indexPath.row + 1
         
-        if let image = imageCache[imageCacheRow] {
-            completion(image)
+        if let item = self.imageCache[itemCacheRow] {
+            completion(item)
             return
         }
         
         let completionBlock: ((UIImage)->()) = { image in
             DispatchQueue.main.async {
-                self.imageCache[imageCacheRow] = image
+                self.imageCache[itemCacheRow] = image
                 completion(image)
             }
         }
         
-        switch imageCacheRow {
+        switch itemCacheRow {
         case 0:
             humanPosesImage(overImage: testImage, completion: completionBlock)
         case 1:
@@ -148,23 +151,30 @@ extension PoseEstimationViewModel: PoseEstimationViewModelProtocol {
             filteredHeatMapCandidatesImage(completion: completionBlock)
         case 4:
             pafLayersCombinedImage(completion: completionBlock)
-        case 5..<totalImageCount - 1:
+        case 5..<self.totalImageCount - 1:
             if !jointsWithConnectionsByLayersProcesing {
                 jointsWithConnectionsByLayersProcesing = true
-                jointsWithConnectionsByLayers { images in
+                self.jointsWithConnectionsByLayers { result in
                     DispatchQueue.main.async {
                         self.jointsWithConnectionsByLayersProcesing = false
-                        images.enumerated().forEach { idx, element in
-                            self.imageCache[5 + idx] = element
+                        result.enumerated().forEach { idx, element in
+                            let (image, (joint1, joint2)) = element
+                            let itemIndex = idx + 5
+                            self.imageCache[itemIndex] = image
+                            self.descriptionCache[itemIndex] = (joint1, joint2)
                         }
                         self.view?.reload()
-                        completion(images.first ?? UIImage())
+                        completion(result.first?.0 ?? UIImage())
                     }
                 }
             }
         default:
             completion(UIImage())
         }
+    }
+    
+    private func jointsDescription(_ joints: (BodyJoint, BodyJoint)) -> String {
+        "\(joints.0.rawValue)-\(joints.1.rawValue)"
     }
     
     func description(for indexPath: IndexPath) -> String {
@@ -174,15 +184,18 @@ extension PoseEstimationViewModel: PoseEstimationViewModelProtocol {
         
         switch indexPath.row {
         case 0:
-            return "HeatMap matrices are combined into one image.\nParts are higlighted with with different colors."
+            return "HeatMap matrices combined"
         case 1:
-            return "HeatMap candidates. A color intensity represents a candidates's confidence."
+            return "HeatMap candidates"
         case 2:
-            return "Filtered version of the HeatMap candidates."
+            return "Filtered HeatMap candidates"
         case 3:
-            return "PAFs matrices combined into a one image.\nParts are higlighted with different colors."
+            return "PAFs"
         case 4..<self.totalImageCount - 1:
-            return "HeatMap with PAFs are used together to create a connection between joints."
+            guard let joints = descriptionCache[indexPath.row] else {
+                return ""
+            }
+            return jointsDescription(joints)
         default:
             return ""
         }
