@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0A1ADA30225BB1C40057CD16 /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A1ADA2F225BB1C40057CD16 /* ImageCollectionViewCell.swift */; };
+		0A7B79FF241B5C0800D5C6B3 /* PoseBody_MNV2_Single_14.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B79FD241B5C0700D5C6B3 /* PoseBody_MNV2_Single_14.mlmodel */; };
+		0A7B7A00241B5C0800D5C6B3 /* PoseBody_CNN_Multi_15.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0A7B79FE241B5C0700D5C6B3 /* PoseBody_CNN_Multi_15.mlmodel */; };
 		0A9EB0EF2242D1F80047223E /* Pose.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A9EB0E52242D1F80047223E /* Pose.framework */; };
 		0A9EB0F42242D1F80047223E /* poseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A9EB0F32242D1F80047223E /* poseTests.swift */; };
 		0A9EB0F62242D1F80047223E /* Pose.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A9EB0E82242D1F80047223E /* Pose.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -28,8 +30,6 @@
 		0AA2ECDE240BF7C80082B607 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA2ECDD240BF7C80082B607 /* SettingsViewController.swift */; };
 		0AA2ECE0240C16B60082B607 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA2ECDF240C16B60082B607 /* SettingsViewModel.swift */; };
 		0AA2ECE2240DA16F0082B607 /* PoseEstimationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA2ECE1240DA16F0082B607 /* PoseEstimationViewModel.swift */; };
-		0AA2ECE5240EECC10082B607 /* PoseCNN_Multi_15.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0AA2ECE3240EECC10082B607 /* PoseCNN_Multi_15.mlmodel */; };
-		0AA2ECE6240EECC10082B607 /* PoseMNV2_Single_14.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0AA2ECE4240EECC10082B607 /* PoseMNV2_Single_14.mlmodel */; };
 		0AA2ECE8240EFC5B0082B607 /* PoseEstimationViewModelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA2ECE7240EFC5B0082B607 /* PoseEstimationViewModelProtocol.swift */; };
 		0AA2ECEA240EFCE80082B607 /* PoseEstimationViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA2ECE9240EFCE80082B607 /* PoseEstimationViewController+Extension.swift */; };
 		C25DF385FD390C9612125856 /* Pods_poseTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25DF51590DD3A762EE8BDB05 /* Pods_poseTests.framework */; };
@@ -77,6 +77,8 @@
 
 /* Begin PBXFileReference section */
 		0A1ADA2F225BB1C40057CD16 /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
+		0A7B79FD241B5C0700D5C6B3 /* PoseBody_MNV2_Single_14.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = PoseBody_MNV2_Single_14.mlmodel; path = CoreMLModels/PoseBody_MNV2_Single_14.mlmodel; sourceTree = "<group>"; };
+		0A7B79FE241B5C0700D5C6B3 /* PoseBody_CNN_Multi_15.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = PoseBody_CNN_Multi_15.mlmodel; path = CoreMLModels/PoseBody_CNN_Multi_15.mlmodel; sourceTree = "<group>"; };
 		0A9EB0E52242D1F80047223E /* Pose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A9EB0E82242D1F80047223E /* Pose.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Pose.h; sourceTree = "<group>"; };
 		0A9EB0E92242D1F80047223E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -100,8 +102,6 @@
 		0AA2ECDD240BF7C80082B607 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		0AA2ECDF240C16B60082B607 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		0AA2ECE1240DA16F0082B607 /* PoseEstimationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseEstimationViewModel.swift; sourceTree = "<group>"; };
-		0AA2ECE3240EECC10082B607 /* PoseCNN_Multi_15.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = PoseCNN_Multi_15.mlmodel; path = CoreMLModels/PoseCNN_Multi_15.mlmodel; sourceTree = "<group>"; };
-		0AA2ECE4240EECC10082B607 /* PoseMNV2_Single_14.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = PoseMNV2_Single_14.mlmodel; path = CoreMLModels/PoseMNV2_Single_14.mlmodel; sourceTree = "<group>"; };
 		0AA2ECE7240EFC5B0082B607 /* PoseEstimationViewModelProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseEstimationViewModelProtocol.swift; sourceTree = "<group>"; };
 		0AA2ECE9240EFCE80082B607 /* PoseEstimationViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PoseEstimationViewController+Extension.swift"; sourceTree = "<group>"; };
 		1C0FB54EE83EE13DFA68B461 /* Pods-pose.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pose.release.xcconfig"; path = "Pods/Target Support Files/Pods-pose/Pods-pose.release.xcconfig"; sourceTree = "<group>"; };
@@ -150,8 +150,8 @@
 		0A9EB0DB2242D1F70047223E = {
 			isa = PBXGroup;
 			children = (
-				0AA2ECE3240EECC10082B607 /* PoseCNN_Multi_15.mlmodel */,
-				0AA2ECE4240EECC10082B607 /* PoseMNV2_Single_14.mlmodel */,
+				0A7B79FE241B5C0700D5C6B3 /* PoseBody_CNN_Multi_15.mlmodel */,
+				0A7B79FD241B5C0700D5C6B3 /* PoseBody_MNV2_Single_14.mlmodel */,
 				0A9EB1092242DFE70047223E /* Extensions */,
 				0A9EB0E82242D1F80047223E /* Pose.h */,
 				0A9EB13F224B4A5D0047223E /* PoseCommon.swift */,
@@ -485,9 +485,11 @@
 				0A9EB1102242DFE70047223E /* UnsafeMutablePointer+Extension.swift in Sources */,
 				0A9EB140224B4A5D0047223E /* PoseCommon.swift in Sources */,
 				0A9EB1112242DFE70047223E /* Array+Extension.swift in Sources */,
+				0A7B79FF241B5C0800D5C6B3 /* PoseBody_MNV2_Single_14.mlmodel in Sources */,
 				0A9EB10F2242DFE70047223E /* UIImage+Extension.swift in Sources */,
 				0A9EB1002242D45D0047223E /* Pose.swift in Sources */,
 				0A9EB10E2242DFE70047223E /* UIColor+Extension.swift in Sources */,
+				0A7B7A00241B5C0800D5C6B3 /* PoseBody_CNN_Multi_15.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -504,7 +506,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0AA2ECE2240DA16F0082B607 /* PoseEstimationViewModel.swift in Sources */,
-				0AA2ECE6240EECC10082B607 /* PoseMNV2_Single_14.mlmodel in Sources */,
 				0AA2ECEA240EFCE80082B607 /* PoseEstimationViewController+Extension.swift in Sources */,
 				0A9EB126224445E70047223E /* PoseEstimationViewController.swift in Sources */,
 				0A9EB124224445E70047223E /* AppDelegate.swift in Sources */,
@@ -512,7 +513,6 @@
 				0AA2ECDE240BF7C80082B607 /* SettingsViewController.swift in Sources */,
 				0AA2ECE8240EFC5B0082B607 /* PoseEstimationViewModelProtocol.swift in Sources */,
 				0AA2ECE0240C16B60082B607 /* SettingsViewModel.swift in Sources */,
-				0AA2ECE5240EECC10082B607 /* PoseCNN_Multi_15.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

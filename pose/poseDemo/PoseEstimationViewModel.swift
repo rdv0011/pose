@@ -206,9 +206,9 @@ enum PoseEstimationViewModelFactory {
     static func instance(modelConfiguration: ModelConfiguration, view: PoseEstimationViewProtocol) -> PoseEstimationViewModelProtocol {
         switch modelConfiguration {
         case .openPose:
-            return PoseEstimationViewModel(poseEstimation: PoseEstimation(model: PoseCNN_Multi_15().model, modelConfiguration: ModelConfigurationCNNMulti15()), view: view)
+            return PoseEstimationViewModel(poseEstimation: PoseEstimation(model: PoseBody_CNN_Multi_15().model, modelConfiguration: ModelConfigurationCNNMulti15()), view: view)
         case .mobileNetV2:
-            return PoseEstimationViewModel(poseEstimation: PoseEstimation(model: PoseMNV2_Single_14().model, modelConfiguration: ModelConfigurationMNV2Single14()), view: view)
+            return PoseEstimationViewModel(poseEstimation: PoseEstimation(model: PoseBody_MNV2_Single_14().model, modelConfiguration: ModelConfigurationMNV2Single14()), view: view)
         }
     }
 }
